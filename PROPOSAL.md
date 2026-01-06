@@ -1,28 +1,37 @@
-# Final Project Proposal
 
-## Group Members:
+# Final Project Proposal 
 
-names here.(CHANGE THIS!!!!!)
-       
-# Intentions:
+## Group Members: 
 
-A statement of the problem you are solving and/or a high level description of the project. (CHANGE THIS!!!!!)
+Aleksandr Gaziiantc | Jesse Lam
+
+
+# Intentions: ASCII game engine 
+
+- 2D Game library
+
+- Can draw images (maybe even a map) (the map will be a really big image btw) (40mb per machine trust real fr) 
     
-# Intended usage:
+    - worst compression ever to deal with that 
 
-A description as to how the project will be used (describe the user interface). (CHANGE THIS!!!!!)
-  
-# Technical Details:
+- Multiplayer (hopefully not copy pasted from a lab) P2P but not really more like what among us does
 
-(CHANGE THIS!!!!!)
+- Input (and output potentially, depends really) 
+ 
+- Maybe possibly SDL depending on if we give up or something
 
-A description of your technical design. This should include: 
-   
-How you will be using the topics covered in class in the project.
-     
-How you are breaking down the project and who is responsible for which parts.
-  
-    
-# Intended pacing:
+# Intended Usage: 
 
-A timeline with expected completion dates of parts of the project. (CHANGE THIS!!!!!)
+- you make suspicious ascii games and whatnot (will update once we make our game) 
+
+# Technical Details: 
+
+- idk use ncurses or smth we will figure it out trust maybe sdl (maybe vulkan (maybe))
+
+- Budget sprite drawing
+
+- Vector2 library (our own) 
+
+- WASD Movement toggle input, kind of like a joystick (GLFW but worse) 
+
+- UDP networking library (our own)
