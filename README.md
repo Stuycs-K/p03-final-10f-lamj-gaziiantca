@@ -1,19 +1,25 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/QfAIDTGi)
-# PROJECT NAME HERE (CHANGE THIS!!!!!)
- 
-### GROUP NAME HERE (CHANGE THIS!!!!!)
+# ASCII Game Engine
 
-Group Members Here (CHANGE THIS!!!!!)
-       
+### Group: Ctrl + Alt + L + F4
+
+- Aleksandr Gaziiantc
+- Jesse Lam
+
 ### Project Description:
 
-Explain what is this project. (CHANGE THIS!!!!!)
-  
+Create games in terminal
+
 ### Instructions:
 
-How does the user install/compile/run the program. (CHANGE THIS!!!!!)
-How does the user interact with this program? (CHANGE THIS!!!!!)
+Run this command in terminal:
+
+  $make compile
+
+Enter build directory to find server and client programs.
+
+How to use: sus
 
 ### Resources/ References:
 
-list here(CHANGE THIS!!!!!)
+Robux
