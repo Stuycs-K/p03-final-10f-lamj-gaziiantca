@@ -7,10 +7,10 @@ SRC = src
 CFLAGS = -lncurses -I$(INCLUDE) -DNDEBUG
 
 
-_OBJS = main.o ascii_image.o consts.o 
+_OBJS = main.o ascii_image.o consts.o player.o
 OBJS = $(patsubst %, $(BUILD)/%, $(_OBJS))
 
-_HEADERS = ascii_image.h consts.h types.h 
+_HEADERS = ascii_image.h consts.h types.h player.h
 HEADERS = $(patsubst %, $(INCLUDE)/%, $(_HEADERS))
 
 
@@ -28,6 +28,5 @@ $(BUILD)/%.o: $(SRC)/%.c $(HEADERS)
 sus:
 	echo $(OBJS)
 
-clean: 
+clean:
 	rm -rf $(BUILD)/*
-
