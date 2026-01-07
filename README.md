@@ -1,7 +1,7 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/QfAIDTGi)
 # ASCII Game Engine
 
-### Group: Ctrl + Alt + L + F4
+### Group: Ctrl + Alt + L
 
 - Aleksandr Gaziiantc
 - Jesse Lam
@@ -18,8 +18,6 @@ Run this command in terminal:
 
 Enter build directory to find server and client programs.
 
-How to use: sus
+How to use:
 
 ### Resources/ References:
-
-Robux
