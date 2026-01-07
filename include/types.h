@@ -12,16 +12,34 @@ typedef int16_t i16;
 typedef int8_t i8;
 
 typedef struct pixel {
-	u8 r; u8 g; u8 b; char c; 
+	u8 r, g, b; 
+	char c; 
 	//please no padding mr c
-} __attribute__((packed)) pixel; //NO PADDING MR GCC THANK YOU 
+} __attribute__((packed)) hdPixel; //NO PADDING MR GCC THANK YOU 
 
 typedef struct rawImage {
 	u16 size_x; 
 	u16 size_y; 
-	pixel* map; 
-} rawImage;
+	hdPixel* map; //hd stands for header btw
+	u8 bgFill; 
+} hdRawImage;
 
+typedef struct compressedPixel {
+	u16 count; 
+	u16 pos; 
+} hdCompressedPixel; 
+
+typedef struct pallete {
+	u32 size; 
+	hdPixel* arr;
+} hdPixelPallete;
+
+typedef struct compressedMap {
+	u16 size_x; 
+	u16 size_y; 
+	hdCompressedPixel* map;
+	hdPixelPallete* pallete;
+} hdCompressedMap;
 
 
 #endif
