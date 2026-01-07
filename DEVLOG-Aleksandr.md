@@ -25,4 +25,4 @@ was not in the school due to winter break
 wrote the finalized proposal 
 spent 30 minutes backseating the file structure
 made makefile from hell
-
+made ascii image parsing 
