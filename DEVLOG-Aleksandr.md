@@ -26,3 +26,8 @@ wrote the finalized proposal
 spent 30 minutes backseating the file structure
 made makefile from hell
 
+### 2026-01-07
+
+renamed the types to have hd in front of them because idk 
+improved file parsing such that the files can have backgrounds without breaking everything 
+started work on compressed images
