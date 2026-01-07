@@ -3,5 +3,5 @@
 
 #include "types.h" 
 hdRawImage* loadRawImage(char* path); 
-
+void writeRawImage(hdRawImage* img, char* path);
 #endif

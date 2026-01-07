@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <string.h> 
 #include <errno.h>
-
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "ascii_image.h"
 
@@ -83,3 +84,15 @@ fortyeight:
 #endif
 	return out;
 }
+
+void writeRawImage(hdRawImage* img, char* path) {
+	int f = open(path, O_WRONLY | O_TRUNC | O_CREAT, 0644); 
+	int bytes; 
+	bytes = write(f, &img->size_x, sizeof(img->size_x));
+	if(bytes < 0) err("Writing raw image size x");
+	bytes = write(f, &img->size_y, sizeof(img->size_y));
+	if(bytes < 0) err("Writing raw image size y");
+	bytes = write(f, &img->map, img->size_x * img->size_y * sizeof(*img->map)); //boy I sure do hope my array doesn't decay! (he works at the array decay factory)
+	if(bytes < 0) err("Writing raw image map");
+}
+

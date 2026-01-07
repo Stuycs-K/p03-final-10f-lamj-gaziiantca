@@ -13,7 +13,7 @@ int main(){
 		}
 		printf("\n");
 	}
-
+	writeRawImage(img, "kneesurgery.img");
 
 	return 0;
 }
