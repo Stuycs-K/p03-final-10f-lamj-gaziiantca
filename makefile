@@ -4,13 +4,13 @@ _BUILDNAME_ = test
 BUILD = build
 INCLUDE = include
 SRC = src
-CFLAGS = -lncurses -I$(INCLUDE)
+CFLAGS = -lncurses -I$(INCLUDE) -DNDEBUG
 
 
-_OBJS = main.o 
+_OBJS = main.o ascii_image.o consts.o 
 OBJS = $(patsubst %, $(BUILD)/%, $(_OBJS))
 
-_HEADERS = 
+_HEADERS = ascii_image.h consts.h types.h 
 HEADERS = $(patsubst %, $(INCLUDE)/%, $(_HEADERS))
 
 

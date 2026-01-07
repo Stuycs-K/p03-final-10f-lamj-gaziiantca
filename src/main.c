@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "ascii_image.h"
+
 int main(){
-	printf("Hello world\n");
+	loadRawImage("assets/testsprite.txt");
 	return 0;
 }
