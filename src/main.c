@@ -25,7 +25,7 @@ void testRawImageReadingAndWriting(char* path){
 				return;
 			}
 		}
-		//printf("\n");
+		printf("\n");
 	}
 	remove("temp.img");
 	printf("it did not break :thumbsup:\n");
@@ -46,6 +46,6 @@ int main(){
 	}
 	writeRawImage(img, "kneesurgery.img");
 */
-	testRawImageReadingAndWriting("assets/TheSkeld.txt");
+	testRawImageReadingAndWriting("assets/sus.txt");
 	return 0;
 }
