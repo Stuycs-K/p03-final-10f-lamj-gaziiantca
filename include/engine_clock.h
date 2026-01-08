@@ -6,7 +6,7 @@
   #define ENGINE_CLOCK_H
 
   #define baseTPS 60
-  #define usleepError 200
+  #define usleepError 300
   #define micros_per_second 1e6
 
   void EngineClock_init();
