@@ -78,7 +78,7 @@ void testEngineClock() {
     Player_handleInput(newPlayer, input);
     Player_updateMovement(newPlayer, dt);
 
-    clear();
+    erase();
     mvprintw(0, 0, "Time Elapsed: %.2lfs", timeElapsed());
     mvprintw(1, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
     mvprintw(2, 0, "dt=%lf | TPS=%.2f\n", dt, 1/dt);
@@ -90,6 +90,6 @@ void testEngineClock() {
 }
 
 int main(){
-	// loadRawImage("assets/testsprite.txt");
+	testRawImageReadingAndWriting("assets/sus.txt");
   testEngineClock();
 }

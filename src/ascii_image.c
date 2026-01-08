@@ -127,3 +127,5 @@ void nukeRawImage(hdRawImage* img){
 	free(img->map); 
 	free(img);
 }
+
+
