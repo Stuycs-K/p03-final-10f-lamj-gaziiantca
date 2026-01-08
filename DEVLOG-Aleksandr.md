@@ -32,3 +32,11 @@ renamed the types to have hd in front of them because idk
 improved file parsing such that the files can have backgrounds without breaking everything 
 started work on compressed images
 made ascii image parsing 
+
+### 2026-01-08 
+
+made image writing and reading 
+made testing for images 
+downloaded a hashmap library 
+continued working on compressing images 
+

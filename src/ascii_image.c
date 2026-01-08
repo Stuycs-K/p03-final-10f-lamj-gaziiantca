@@ -128,4 +128,13 @@ void nukeRawImage(hdRawImage* img){
 	free(img);
 }
 
+hdPixelPalette* genPallete(hdRawImage* img){
 
+}
+
+hdCompressedMap* compressRawImage(hdRawImage* img){
+	hdCompressedMap* out = (hdCompressedMap*) (malloc(sizeof(hdCompressedMap)));
+	out->size_x = img->size_x;
+	out->size_y = img->size_y; 
+	hdPixelPalette* pallete = genPallete(img);
+}
