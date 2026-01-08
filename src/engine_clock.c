@@ -27,3 +27,22 @@ double timeElapsed() {
   return ((double) latestFrameTime - startTime) / micros_per_second;
 }
 
+double waitForNextFrame() {
+  uint64_t currentTime = getTime();
+  uint64_t nextFrameTime = latestFrameTime + micros_per_second / baseTPS;
+
+  if (currentTime < nextFrameTime) {
+    uint64_t timeUntilNextFrame = nextFrameTime - currentTime;
+    if (timeUntilNextFrame > usleepError) {
+      usleep(timeUntilNextFrame - usleepError);
+    }
+    while (getTime() < nextFrameTime);
+  }
+
+  uint64_t oldFrameTime = latestFrameTime;
+  latestFrameTime = getTime();
+  deltaTime = latestFrameTime - oldFrameTime;
+  double delta_time_in_sec = (double) (deltaTime) / micros_per_second;
+
+  return delta_time_in_sec;
+}
