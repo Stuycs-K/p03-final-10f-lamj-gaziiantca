@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 
-static inline Vector2 Vector2_new(double x, double y) {
+Vector2 Vector2_new(double x, double y) {
   return (Vector2) {x, y};
 }
 

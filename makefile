@@ -4,13 +4,13 @@ _BUILDNAME_ = test
 BUILD = build
 INCLUDE = include
 SRC = src
-CFLAGS = -lncurses -I$(INCLUDE) -DNDEBUG
+CFLAGS = -lncurses -I$(INCLUDE) -DNDEBUG -lm
 
 
-_OBJS = main.o ascii_image.o
+_OBJS = main.o ascii_image.o consts.o engine_clock.o player.o vector2.o
 OBJS = $(patsubst %, $(BUILD)/%, $(_OBJS))
 
-_HEADERS = ascii_image.h types.h 
+_HEADERS = ascii_image.h consts.h engine_clock.h player.h types.h vector2.h
 HEADERS = $(patsubst %, $(INCLUDE)/%, $(_HEADERS))
 
 
@@ -28,6 +28,5 @@ $(BUILD)/%.o: $(SRC)/%.c $(HEADERS)
 sus:
 	echo $(OBJS)
 
-clean: 
+clean:
 	rm -rf $(BUILD)/*
-

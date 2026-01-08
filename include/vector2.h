@@ -5,7 +5,7 @@
     double x, y;
   } Vector2;
 
-  static inline Vector2 Vector2_new(double x, double y);
+  Vector2 Vector2_new(double x, double y);
 
   Vector2 Vector2_add(Vector2 v1, Vector2 v2);
   Vector2 Vector2_sub(Vector2 v1, Vector2 v2);
