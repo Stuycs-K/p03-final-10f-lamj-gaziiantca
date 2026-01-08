@@ -3,24 +3,24 @@
 
   typedef struct {
     double x, y;
-  } Vec2;
+  } Vector2;
 
-  static inline Vec2 Vec2_new(double x, double y);
+  Vector2 Vector2_new(double x, double y);
 
-  Vec2 Vec2_add(Vec2 v1, Vec2 v2);
-  Vec2 Vec2_sub(Vec2 v1, Vec2 v2);
-  Vec2 Vec2_scale(Vec2 v, double scalar);
+  Vector2 Vector2_add(Vector2 v1, Vector2 v2);
+  Vector2 Vector2_sub(Vector2 v1, Vector2 v2);
+  Vector2 Vector2_scale(Vector2 v, double scalar);
 
-  double Vec2_dot(Vec2 v1, Vec2 v2);
-  double Vec2_cross(Vec2 v1, Vec2 v2);
+  double Vector2_dot(Vector2 v1, Vector2 v2);
+  double Vector2_cross(Vector2 v1, Vector2 v2);
 
-  double Vec2_magSq(Vec2 v);
-  double Vec2_mag(Vec2 v);
+  double Vector2_magSq(Vector2 v);
+  double Vector2_mag(Vector2 v);
 
-  Vec2 Vec2_normalize(Vec2 v);
+  Vector2 Vector2_normalize(Vector2 v);
 
-  void Vec2_print(Vec2 v);
+  void Vector2_print(Vector2 v);
 
-  double Vec2_dist(Vec2 v1, Vec2 v2);
+  double Vector2_dist(Vector2 v1, Vector2 v2);
 
 #endif
