@@ -17,7 +17,7 @@ HEADERS = $(patsubst %, $(INCLUDE)/%, $(_HEADERS))
 run: compile
 	./$(BUILD)/$(_BUILDNAME_)
 
-compile: ./$(BUILD)/test
+compile: ./$(BUILD)/$(_BUILDNAME_)
 
 ./$(BUILD)/$(_BUILDNAME_): $(OBJS)
 	gcc -o ./$(BUILD)/$(_BUILDNAME_) $(OBJS) $(HEADERS) $(CFLAGS)
