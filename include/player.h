@@ -12,7 +12,7 @@
     Vector2 pos, vel;
   } Player;
 
-  Player* Player_new(char* name);
+  void Player_init(Player* newPlayer, char* name);
   void Player_updateMovement(Player* p, double dt);
   void Player_handleInput(Player* p, char c);
 
