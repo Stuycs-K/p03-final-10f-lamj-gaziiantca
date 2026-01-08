@@ -23,4 +23,6 @@
 
 - Added function to test frame timer and budget wasd inputs for changing player status
 
-### 2026-01-08 - 
+### 2026-01-08 - Working on events
+
+- Added preliminary linkedlist used to hold event callbacks
