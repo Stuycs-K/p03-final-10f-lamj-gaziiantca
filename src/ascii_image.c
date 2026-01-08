@@ -87,12 +87,43 @@ fortyeight:
 
 void writeRawImage(hdRawImage* img, char* path) {
 	int f = open(path, O_WRONLY | O_TRUNC | O_CREAT, 0644); 
+	if(f < 0) err(path);
 	int bytes; 
+#ifdef NDEBUG
+	printf("Writing sizes %d X %d\n", img->size_x, img->size_y);
+#endif
 	bytes = write(f, &img->size_x, sizeof(img->size_x));
 	if(bytes < 0) err("Writing raw image size x");
 	bytes = write(f, &img->size_y, sizeof(img->size_y));
 	if(bytes < 0) err("Writing raw image size y");
-	bytes = write(f, &img->map, img->size_x * img->size_y * sizeof(*img->map)); //boy I sure do hope my array doesn't decay! (he works at the array decay factory)
+	bytes = write(f, img->map, img->size_x * img->size_y * sizeof(*img->map)); //boy I sure do hope my array doesn't decay! (he works at the array decay factory)
 	if(bytes < 0) err("Writing raw image map");
+#ifdef NDEBUG
+	printf("Wrote %d bytes map, should be %lu\n", bytes, img->size_x * img->size_y * sizeof(hdPixel));
+#endif
 }
 
+hdRawImage* readRawImage(char* path){
+	int f = open(path, O_RDONLY, 0); 
+	if(f < 0) err(path);
+	int bytes;  
+	hdRawImage* out = (hdRawImage*)(malloc(sizeof(hdRawImage)));
+
+	bytes = read(f, &out->size_x, sizeof(out->size_x));
+	if(bytes < 0) err("Reading raw image size x");
+	bytes = read(f, &out->size_y, sizeof(out->size_y));
+	if(bytes < 0) err("Reading raw image size y");
+#ifdef NDEBUG
+	printf("Trying to read %lu byte %d X %d map\n", out->size_x * out->size_y * sizeof(*out->map), out->size_x, out->size_y);
+#endif
+	out->map = (hdPixel*) (malloc(out->size_x * out->size_y * sizeof(*out->map)));
+	bytes = read(f, out->map, out->size_x * out->size_y * sizeof(*out->map));
+	if(bytes < 0) err("Reading raw image map");
+
+	return out;
+}
+
+void nukeRawImage(hdRawImage* img){
+	free(img->map); 
+	free(img);
+}

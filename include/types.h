@@ -21,7 +21,6 @@ typedef struct rawImage {
 	u16 size_x; 
 	u16 size_y; 
 	hdPixel* map; //hd stands for header btw
-	u8 bgFill; 
 } hdRawImage;
 
 typedef struct compressedPixel {
@@ -29,16 +28,16 @@ typedef struct compressedPixel {
 	u16 pos; 
 } hdCompressedPixel; 
 
-typedef struct pallete {
+typedef struct thepalwhoate {
 	u32 size; 
 	hdPixel* arr;
-} hdPixelPallete;
+} hdPixelPalette;
 
 typedef struct compressedMap {
 	u16 size_x; 
 	u16 size_y; 
 	hdCompressedPixel* map;
-	hdPixelPallete* pallete;
+	hdPixelPalette* palette;
 } hdCompressedMap;
 
 
