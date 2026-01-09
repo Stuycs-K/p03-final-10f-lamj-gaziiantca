@@ -20,8 +20,8 @@
   } Connection;
 
   void Signal_Fire(Signal* self, void* arg);
-  Connection Signal_Connect(Signal* self);
-  Connection Signal_ConnectOnce(Signal* self);
+  Connection* Signal_Connect(Signal* self, SignalCallback callback);
+  Connection* Signal_ConnectOnce(Signal* self, SignalCallback callback);
 
   void Connection_Disconnect(Connection* self);
 #endif

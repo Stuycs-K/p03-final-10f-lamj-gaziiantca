@@ -33,4 +33,8 @@
 
 - Edited some header definitions (Vector2, Player). Added event_signals.h header definitions. (20 min)
 
-### 2026-01-09 - 
+### 2026-01-09 - Adding events
+
+- Backseating bad image compression (1 min)
+
+- Worked on adding Signal/Event funciton definitions (40 min)

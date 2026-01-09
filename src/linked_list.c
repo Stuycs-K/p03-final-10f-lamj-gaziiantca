@@ -53,11 +53,11 @@ void LinkedList_deleteNode(LinkedList* list, Node* node) {
   Node* next = node->next;
 
   connectNodes(prev, next);
-  
+
   if (node == list->front) {
     list->front = next;
-  } 
-  
+  }
+
   if (node == list->end) {
     list->end = prev;
   }
