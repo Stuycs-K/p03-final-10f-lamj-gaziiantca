@@ -1,52 +1,79 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "linked_list.h"
 
-struct node* createNode(void* entry) {
-  struct node* newNode = (struct node*) malloc(sizeof(struct node));
+#include <stdlib.h>
+
+Node* createNode(void* entry) {
+  Node* newNode = (Node*) malloc(sizeof(Node));
   newNode->entry = entry;
-  return newNode
+  newNode->prev = NULL;
+  newNode->next = NULL;
+  return newNode;
 }
 
-struct node* insert_front(struct node* list, void* entry) {
-  struct node* newFront = createNode(entry);
-  newFront->next = list;
+void connectNodes(Node* prev, Node* next) {
+  if (prev) {
+    prev->next = next;
+  }
+  if (next) {
+    next->prev = prev;
+  }
+}
 
+
+
+LinkedList* LinkedList_new() {
+  LinkedList* newList = (LinkedList*) malloc(sizeof(LinkedList));
+  newList->front = NULL;
+  newList->end = NULL;
+  return newList;
+}
+
+Node* LinkedList_insertFront(LinkedList* list, void* entry) {
+  Node* newFront = createNode(entry);
+
+  Node* oldFront = list->front;
+  list->front = newFront;
+
+  connectNodes(newFront, oldFront);
   return newFront;
 }
 
-struct node* free_list(struct node* list) {
-  struct node* nextNode = NULL;
-  while (list) {
-    nextNode = list->next;
-    free(list);
-    list = nextNode;
-  }
+Node* LinkedList_insertEnd(LinkedList* list, void* entry) {
+  Node* newEnd = createNode(entry);
 
-  return NULL;
+  Node* oldEnd = list->end;
+  list->end = newEnd;
+
+  connectNodes(oldEnd, newEnd);
+  return newEnd;
 }
 
-struct node* remove_node_by_index(struct node* list, int index) {
-  struct node* front = list;
-  if (!index) {
-    front = list->next;
-    free(list);
-    list = NULL;
-    return front;
+void LinkedList_deleteNode(LinkedList* list, Node* node) {
+  Node* prev = node->prev;
+  Node* next = node->next;
+
+  connectNodes(prev, next);
+  
+  if (node == list->front) {
+    list->front = next;
+  } 
+  
+  if (node == list->end) {
+    list->end = prev;
   }
 
-  while (list && index > 1) {
-    list = list->next;
-    index--;
+  free(node);
+}
+
+void LinkedList_free(LinkedList* list) {
+  Node* cur = list->front;
+  Node* next = NULL;
+
+  while (cur) {
+    next = cur->next;
+    free(cur);
+    cur = next;
   }
 
-  if (index == 1) {
-    struct node* removedNode = list->next;
-    if (!removedNode) return front;
-    list->next = removedNode->next;
-    free(removedNode);
-    removedNode = NULL;
-  }
-
-  return front;
+  free(list);
 }

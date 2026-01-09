@@ -1,12 +1,28 @@
 #ifndef LINKED_LIST_H
   #define LINKED_LIST_H
-  struct node {
-    void* entry;
-    struct node* next;
-  };
-  struct node* createNode(void* entry);
+  typedef struct Node {
 
-  struct node* insert_front(struct node* list, void* entry);
-  struct node* free_list(struct node* list);
-  struct node* remove_node_by_index(struct node* list, int index);
+    struct Node* prev;
+    void* entry;
+    struct Node* next;
+
+  } Node;
+
+  Node* createNode(void* entry);
+  void connectNodes(Node* prev, Node* next);
+
+  typedef struct LinkedList {
+
+    Node* front;
+    Node* end;
+
+  } LinkedList;
+
+  LinkedList* LinkedList_new();
+  Node* LinkedList_insertFront(LinkedList* list, void* entry);
+  Node* LinkedList_insertEnd(LinkedList* list, void* entry);
+
+  void LinkedList_deleteNode(LinkedList* list, Node* node);
+
+  void LinkedList_free(LinkedList* list);
 #endif
