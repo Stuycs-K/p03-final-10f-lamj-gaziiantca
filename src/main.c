@@ -2,16 +2,18 @@
 #include <stdio.h>
 
 #include <ncurses.h>
+#include "hashmap.h"
 
 #include "engine_clock.h"
 #include "player.h"
 #include "ascii_image.h"
 
+
 void testRawImageReadingAndWriting(char* path){
 	hdRawImage* img = loadRawImage(path);
 	for(int y=0; y<img->size_y; y++){
 		for(int x=0; x<img->size_x; x++){
-			hdPixel* p = &img->map[y * img->size_x + x];
+			hdPixel* p = &img->arr[y * img->size_x + x];
 			printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p->r, p->g, p->b, p->c); 
 		}
 		printf("\n");
@@ -20,8 +22,8 @@ void testRawImageReadingAndWriting(char* path){
 	hdRawImage* img2 = readRawImage("temp.img");
 	for(int y=0; y<img->size_y; y++){
 		for(int x=0; x<img->size_x; x++){
-			hdPixel* p1 = &img2->map[y * img->size_x + x];
-			hdPixel* p2 = &img->map[y * img->size_x + x];
+			hdPixel* p1 = &img2->arr[y * img->size_x + x];
+			hdPixel* p2 = &img->arr[y * img->size_x + x];
 			printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
 			printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
 			if(p1->r != p2->r){
@@ -33,7 +35,28 @@ void testRawImageReadingAndWriting(char* path){
 	}
 	remove("temp.img");
 	printf("it did not break :thumbsup:\n");
+}
 
+void testHashing(){
+	//printf("A\n");
+	hdPixel* p1 = (hdPixel*)(calloc(sizeof(hdPixel), 1)); 
+	hdPixel* p2 = (hdPixel*)(calloc(sizeof(hdPixel), 1)); 
+	hdPixel* p3 = (hdPixel*)(calloc(sizeof(hdPixel), 1)); 
+	p1->c = 'a'; p1->r = 100; p1->g = 100; p1->b = 100; 
+	p2->c = 'a'; p2->r = 100; p2->g = 100; p2->b = 100; 
+	p3->c = 'a'; p3->r = 99; p3->g = 100; p3->b = 100; 
+	//printf("A\n");
+	struct hashmap *map = hashmap_new(sizeof(hdHashEntry), 0, 0, 0, pixel_hash, pixel_compare, NULL, NULL);
+	//printf("A\n");
+	hashmap_set(map, &(hdHashEntry){ .pixel = p1, .pos = 1});
+	hdHashEntry* result;
+	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p1 });
+	printf("This should print 1: %d\n", result->pos);
+	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p2 });
+	printf("This, too, should print 1: %d\n", result!=0);
+	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p3 });
+	printf("This, as well, will print 1: %d\n", result==0);
+	
 
 }
 
@@ -90,6 +113,7 @@ void testEngineClock() {
 }
 
 int main(){
-	testRawImageReadingAndWriting("assets/sus.txt");
-  testEngineClock();
+	//testRawImageReadingAndWriting("assets/sus.txt");
+	testHashing();
+  //testEngineClock();
 }

@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "ascii_image.h"
+#include "hashmap.h"
 
 #define da_append(xs, x) \
 	if(xs.count >= xs.capacity) {\
@@ -76,7 +77,7 @@ fortyeight:
 			xFlag = 0; 
 		}
 	}
-	out->map = f_arr.items; 
+	out->arr = f_arr.items; 
 	out->size_x = size_x; 
 	out->size_y = size_y; 
 #ifdef NDEBUG
@@ -96,7 +97,7 @@ void writeRawImage(hdRawImage* img, char* path) {
 	if(bytes < 0) err("Writing raw image size x");
 	bytes = write(f, &img->size_y, sizeof(img->size_y));
 	if(bytes < 0) err("Writing raw image size y");
-	bytes = write(f, img->map, img->size_x * img->size_y * sizeof(*img->map)); //boy I sure do hope my array doesn't decay! (he works at the array decay factory)
+	bytes = write(f, img->arr, img->size_x * img->size_y * sizeof(*img->arr)); //boy I sure do hope my array doesn't decay! (he works at the array decay factory)
 	if(bytes < 0) err("Writing raw image map");
 #ifdef NDEBUG
 	printf("Wrote %d bytes map, should be %lu\n", bytes, img->size_x * img->size_y * sizeof(hdPixel));
@@ -114,27 +115,40 @@ hdRawImage* readRawImage(char* path){
 	bytes = read(f, &out->size_y, sizeof(out->size_y));
 	if(bytes < 0) err("Reading raw image size y");
 #ifdef NDEBUG
-	printf("Trying to read %lu byte %d X %d map\n", out->size_x * out->size_y * sizeof(*out->map), out->size_x, out->size_y);
+	printf("Trying to read %lu byte %d X %d map\n", out->size_x * out->size_y * sizeof(*out->arr), out->size_x, out->size_y);
 #endif
-	out->map = (hdPixel*) (malloc(out->size_x * out->size_y * sizeof(*out->map)));
-	bytes = read(f, out->map, out->size_x * out->size_y * sizeof(*out->map));
+	out->arr = (hdPixel*) (malloc(out->size_x * out->size_y * sizeof(*out->arr)));
+	bytes = read(f, out->arr, out->size_x * out->size_y * sizeof(*out->arr));
 	if(bytes < 0) err("Reading raw image map");
 
 	return out;
 }
 
 void nukeRawImage(hdRawImage* img){
-	free(img->map); 
+	free(img->arr); 
 	free(img);
 }
 
-hdPixelPalette* genPallete(hdRawImage* img){
-
+int pixel_compare(const void* a, const void* b, void *udata){
+	const hdHashEntry* p1 = a;
+	const hdHashEntry* p2 = b; 
+	return memcmp(p1->pixel, p2->pixel, sizeof(hdPixel));
 }
 
-hdCompressedMap* compressRawImage(hdRawImage* img){
-	hdCompressedMap* out = (hdCompressedMap*) (malloc(sizeof(hdCompressedMap)));
+uint64_t pixel_hash(const void* item, u64 seed0, u64 seed1){
+	const hdHashEntry* p = item; 
+	//printf("(%hhu, %hhu, %hhu, %c) / %b -> %lu\n", p->pixel->r, p->pixel->g, p->pixel->b, p->pixel->c, *p->pixel, hashmap_sip(p->pixel, sizeof(*p->pixel), seed0, seed1));
+	return hashmap_sip(p->pixel, sizeof(*p->pixel), seed0, seed1);
+}
+
+hdCompressedImage* compressRawImage(hdRawImage* img, hdPixelPalette* palette){
+	hdCompressedImage* out = (hdCompressedImage*) (malloc(sizeof(hdCompressedImage)));
 	out->size_x = img->size_x;
 	out->size_y = img->size_y; 
-	hdPixelPalette* pallete = genPallete(img);
+	if(palette == NULL){
+		palette = (hdPixelPalette*) (malloc(sizeof(hdPixelPalette)));
+		struct hashmap* hashmap = hashmap_new(sizeof(hdHashEntry), 0, 0, 0, pixel_hash, pixel_compare, NULL, NULL);
+
+	}
+	
 }

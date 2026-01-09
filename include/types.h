@@ -3,6 +3,7 @@
 
 #include <stdint.h> 
 
+typedef uint64_t u64; 
 typedef uint32_t u32; 
 typedef uint16_t u16; 
 typedef uint8_t u8;
@@ -20,7 +21,7 @@ typedef struct pixel {
 typedef struct rawImage {
 	u16 size_x; 
 	u16 size_y; 
-	hdPixel* map; //hd stands for header btw
+	hdPixel* arr; //hd stands for header btw
 } hdRawImage;
 
 typedef struct compressedPixel {
@@ -28,17 +29,25 @@ typedef struct compressedPixel {
 	u16 pos; 
 } hdCompressedPixel; 
 
+typedef struct hashmapentrybroidkatp {
+	hdPixel* pixel; 
+	u16 pos;
+} hdHashEntry;
+
 typedef struct thepalwhoate {
 	u32 size; 
 	hdPixel* arr;
+	struct hashmap *hashmap; 
+	//the map will contain the pixels pointing to the indices of said pixels in arr
+	//side note but holy moly computer scientists need to stop using the word "map" this is getting riduculous
 } hdPixelPalette;
 
-typedef struct compressedMap {
+typedef struct compressedImage {
 	u16 size_x; 
 	u16 size_y; 
-	hdCompressedPixel* map;
+	hdCompressedPixel* image;
 	hdPixelPalette* palette;
-} hdCompressedMap;
+} hdCompressedImage;
 
 
 #endif
