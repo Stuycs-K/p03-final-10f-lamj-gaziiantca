@@ -51,11 +51,23 @@ void testHashing(){
 	hashmap_set(map, &(hdHashEntry){ .pixel = p1, .pos = 1});
 	hdHashEntry* result;
 	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p1 });
-	printf("This should print 1: %d\n", result->pos);
+	printf("Position of p1 when it is the only element. This should print 1: %d\n", result->pos);
+	if(result->pos != 1){
+		return;
+	}
 	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p2 });
-	printf("This, too, should print 1: %d\n", result!=0);
+	printf("p2, an identical pixel to p1's position. This, too, should print 1: %d\n", result->pos);
+	
+	if(result->pos != 1){
+		return;
+	}
 	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p3 });
-	printf("This, as well, will print 1: %d\n", result==0);
+	printf("p3==0, a different pixel that's not in the map yet. This, as well, will print 1: %d\n", result==0);
+	if(result != 0){
+		return;
+	}
+
+	
 	
 
 }
