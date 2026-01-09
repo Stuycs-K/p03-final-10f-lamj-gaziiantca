@@ -1,9 +1,9 @@
-#include <stdint.h>
-#include <time.h>
-#include <unistd.h>
-
 #ifndef ENGINE_CLOCK_H
   #define ENGINE_CLOCK_H
+
+  #include <stdint.h>
+  #include <time.h>
+  #include <unistd.h>
 
   #define baseTPS 60
   #define usleepError 200

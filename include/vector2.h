@@ -19,8 +19,6 @@
 
   Vector2 Vector2_normalize(Vector2 v);
 
-  void Vector2_print(Vector2 v);
-
   double Vector2_dist(Vector2 v1, Vector2 v2);
 
 #endif

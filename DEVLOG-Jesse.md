@@ -30,3 +30,7 @@
 - Added preliminary linkedlist used to hold event callbacks (20 min)
 
 - Completed doubly-linked LinkedList class in preparation for adding events (1 hr)
+
+- Edited some header definitions (Vector2, Player). Added event_signals.h header definitions. (20 min)
+
+### 2026-01-09 - 
