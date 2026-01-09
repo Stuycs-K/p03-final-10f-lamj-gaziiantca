@@ -208,5 +208,6 @@ hdCompressedImage* compressRawImage(hdRawImage* img, hdPixelPalette* palette){
 			//printf("Curr pixel (count: %d) (%hhu, %hhu, %hhu, %c)\n", stamp.count, p2.r, p2.g, p2.b, p2.c);
 		}
 	}
+	return out;
 	
 }
