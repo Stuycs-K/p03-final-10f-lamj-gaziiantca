@@ -39,4 +39,4 @@ made image writing and reading
 made testing for images 
 downloaded a hashmap library 
 continued working on compressing images 
-
+made functions that make the pixels work with the hashmap library I imported 
