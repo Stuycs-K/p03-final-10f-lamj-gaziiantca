@@ -37,6 +37,11 @@ void testRawImageReadingAndWriting(char* path){
 	printf("it did not break :thumbsup:\n");
 }
 
+void testRawImageCompression(char* path){
+	hdRawImage* img = loadRawImage(path);
+	hdCompressedImage* cimg = compressRawImage(img, NULL);
+}
+
 void testHashing(){
 	//printf("A\n");
 	hdPixel* p1 = (hdPixel*)(calloc(sizeof(hdPixel), 1)); 
@@ -44,14 +49,14 @@ void testHashing(){
 	hdPixel* p3 = (hdPixel*)(calloc(sizeof(hdPixel), 1)); 
 	p1->c = 'a'; p1->r = 100; p1->g = 100; p1->b = 100; 
 	p2->c = 'a'; p2->r = 100; p2->g = 100; p2->b = 100; 
-	p3->c = 'a'; p3->r = 99; p3->g = 100; p3->b = 100; 
+	p3->c = 'a'; p3->r = 100; p3->g = 99; p3->b = 100; 
 	//printf("A\n");
 	struct hashmap *map = hashmap_new(sizeof(hdHashEntry), 0, 0, 0, pixel_hash, pixel_compare, NULL, NULL);
 	//printf("A\n");
 	hashmap_set(map, &(hdHashEntry){ .pixel = p1, .pos = 1});
 	hdHashEntry* result;
 	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p1 });
-	printf("Position of p1 when it is the only element. This should print 1: %d\n", result->pos);
+	printf("Position of p1 when it is the only element with a value of 1. This should print 1: %d\n", result->pos);
 	if(result->pos != 1){
 		return;
 	}
@@ -62,11 +67,11 @@ void testHashing(){
 		return;
 	}
 	result = (hdHashEntry*) hashmap_get(map, &(hdHashEntry) {.pixel = p3 });
-	printf("p3==0, a different pixel that's not in the map yet. This, as well, will print 1: %d\n", result==0);
+	printf("p3==0, a different pixel that's not in the map yet. This, as well, should print 1: %d\n", result==0);
 	if(result != 0){
 		return;
 	}
-
+	
 	
 	
 
@@ -126,6 +131,8 @@ void testEngineClock() {
 
 int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
-	testHashing();
+	testRawImageCompression("assets/smallsus.txt");
+	//testHashing();
+	
   //testEngineClock();
 }

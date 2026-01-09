@@ -16,6 +16,12 @@
 	xs.items[xs.count++] = x;
 //could maybe be funny to build an arena allocator for this but idk if it matters enough 
 
+#define pointer_da_append(xs, x) \
+	if(xs->count >= xs->capacity) {\
+		xs->capacity = xs->capacity * 2 + 1;\
+		xs->items = realloc(xs->items, xs->capacity*sizeof(x));\
+	}\
+	xs->items[xs->count++] = x;
 
 typedef struct dFragArr {
 	hdPixel* items; 
@@ -29,6 +35,7 @@ void err(char* str){
 	}
 	printf(" | %s\n", strerror(errno));
 }
+
 
 hdRawImage* loadRawImage(char* path){ //important note: i will not make this run fast because this is something that should be run once ever per image. whatever game this is used for should not call this. this is a tool for development. not for game. ok.
 	hdRawImage* out = (hdRawImage*)(malloc(sizeof(hdRawImage)));
@@ -100,9 +107,9 @@ void writeRawImage(hdRawImage* img, char* path) {
 	bytes = write(f, img->arr, img->size_x * img->size_y * sizeof(*img->arr)); //boy I sure do hope my array doesn't decay! (he works at the array decay factory)
 	if(bytes < 0) err("Writing raw image map");
 #ifdef NDEBUG
-	printf("Wrote %d bytes map, should be %lu\n", bytes, img->size_x * img->size_y * sizeof(hdPixel));
+		printf("Wrote %d bytes map, should be %lu\n", bytes, img->size_x * img->size_y * sizeof(hdPixel));
 #endif
-}
+	}
 
 hdRawImage* readRawImage(char* path){
 	int f = open(path, O_RDONLY, 0); 
@@ -141,14 +148,65 @@ uint64_t pixel_hash(const void* item, u64 seed0, u64 seed1){
 	return hashmap_sip(p->pixel, sizeof(*p->pixel), seed0, seed1);
 }
 
+int addPixelToSymtab(hdHashEntry* in, hdCompressedImage* img){ //in has to be a pointer for the hash get :( 
+	const hdHashEntry* result; 
+	hdPixel p2 = *in->pixel;
+	//printf("symtab adding (%hhu, %hhu, %hhu, %c)\n", p2.r, p2.g, p2.b, p2.c);
+	//printf("sus %p\n", img->palette);
+	result = (hdHashEntry*) hashmap_get(img->palette->hashmap, in);
+	//printf("%p\n", result);
+	if(result != NULL){
+		//printf("Symtab already has the thing! how convenient\n");
+		return result->pos;
+	}else{
+		in->pos = img->palette->count;
+		pointer_da_append(img->palette, *in->pixel);
+		//printf("%d\n", *(in->pixel));
+		/*if(img->palette->count >= img->palette->capacity){
+			img->palette->capacity = img->palette->capacity * 2 + 1; 
+			img->palette->items = (hdPixel*) (realloc(img->palette->items, img->palette->capacity * sizeof(hdPixel)));
+		}
+		img->palette->items[in->pos] = *in->pixel;
+		img->palette->count++;*/
+
+
+		hashmap_set(img->palette->hashmap, in);
+		return in->pos;
+	}
+}
+
+#define pixelCmp(p1, p2) (p1.r==p2.r && p1.g==p2.g && p1.b==p2.b && p1.c==p2.c)
+
 hdCompressedImage* compressRawImage(hdRawImage* img, hdPixelPalette* palette){
-	hdCompressedImage* out = (hdCompressedImage*) (malloc(sizeof(hdCompressedImage)));
+	hdCompressedImage* out = (hdCompressedImage*) (calloc(sizeof(hdCompressedImage), 1));
 	out->size_x = img->size_x;
 	out->size_y = img->size_y; 
 	if(palette == NULL){
-		palette = (hdPixelPalette*) (malloc(sizeof(hdPixelPalette)));
-		struct hashmap* hashmap = hashmap_new(sizeof(hdHashEntry), 0, 0, 0, pixel_hash, pixel_compare, NULL, NULL);
-
+		palette = (hdPixelPalette*) (calloc(sizeof(hdPixelPalette), 1));
+		palette->hashmap = hashmap_new(sizeof(hdHashEntry), 0, 0, 0, pixel_hash, pixel_compare, NULL, NULL);
+		palette->items = (calloc(sizeof(*palette->items), 1));
+		palette->capacity = 0; palette->count = 0;
+	}
+	out->palette = palette;
+	hdPixel p1 = img->arr[0];
+	hdPixel p2;
+	hdCompressedPixel stamp = { .count = 1};
+	hdHashEntry* entry = &(hdHashEntry) { .pixel = &p1 };
+	for(int y=0; y<out->size_y; y++){
+		for(int x=0; x<out->size_x; x++){
+			p2 = img->arr[y * img->size_x + x];
+			if(!pixelCmp(p1, p2)){
+				p1 = p2;
+				pointer_da_append(out, stamp);
+				stamp.count = 0;
+				entry->pixel = &p2;
+				
+				stamp.pos = addPixelToSymtab(entry, out);
+			}
+			stamp.count++;
+			//printf("palette item at stamp pos (count: %d) (%hhu, %hhu, %hhu, %c), alt rep: %d\n", stamp.count, palette->items[stamp.pos].r, palette->items[stamp.pos].g, palette->items[stamp.pos].b, palette->items[stamp.pos].c, palette->items[stamp.pos]);
+			//printf("Curr pixel (count: %d) (%hhu, %hhu, %hhu, %c)\n", stamp.count, p2.r, p2.g, p2.b, p2.c);
+		}
 	}
 	
 }

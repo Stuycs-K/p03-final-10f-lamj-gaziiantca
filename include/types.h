@@ -35,8 +35,9 @@ typedef struct hashmapentrybroidkatp {
 } hdHashEntry;
 
 typedef struct thepalwhoate {
-	u32 size; 
-	hdPixel* arr;
+	u32 capacity; 
+	u32 count;
+	hdPixel* items;
 	struct hashmap *hashmap; 
 	//the map will contain the pixels pointing to the indices of said pixels in arr
 	//side note but holy moly computer scientists need to stop using the word "map" this is getting riduculous
@@ -45,7 +46,9 @@ typedef struct thepalwhoate {
 typedef struct compressedImage {
 	u16 size_x; 
 	u16 size_y; 
-	hdCompressedPixel* image;
+	hdCompressedPixel* items;
+	u32 capacity;
+	u32 count;
 	hdPixelPalette* palette;
 } hdCompressedImage;
 

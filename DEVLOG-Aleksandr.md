@@ -40,3 +40,9 @@ made testing for images
 downloaded a hashmap library 
 continued working on compressing images 
 made functions that make the pixels work with the hashmap library I imported 
+
+### 2026-01-09 
+
+made non-functional compression 
+spent 30 minutes debugging said compression only to find out my print statement was printing the wrong variables :D
+
