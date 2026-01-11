@@ -38,3 +38,19 @@
 - Backseating bad image compression (1 min)
 
 - Worked on adding Signal/Event funciton definitions (40 min)
+
+### 2026-01-11 (Weekend) - Completing events and fixing errors
+
+- Reduced print statements in makefile
+
+- Fixed engine_clock functions to have appropriate naming scheme (5min)
+
+- Completed event_signals.c (30 min)
+  - Added context argument to signals to pass arguments into function pointers
+  - Added signal_new and fixed Disconnect code
+
+- Added events to the current testing gameloop. Subsequently fixed bugs. (40 min) 
+  - Added a player.moved event to player objects.
+  - Added event test for player.moved
+  - Fixed issue with linked list not setting front/end correctly
+  - Fixed issue with callbacks not being executed

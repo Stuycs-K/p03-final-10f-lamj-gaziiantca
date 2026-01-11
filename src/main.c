@@ -1,11 +1,11 @@
 #include <stdlib.h>
-#include <stdio.h>
-
 #include <ncurses.h>
 
 #include "engine_clock.h"
 #include "player.h"
 #include "ascii_image.h"
+#include "event_signals.h"
+#include "vector2.h"
 
 void exitGame(int n){
 	curs_set(1);
@@ -26,12 +26,25 @@ int get_wasd_input() {
   return 0;
 }
 
-void testEngineClock() {
+void testEvent(void* context, void* args) { // Check if player x pos is >= 10
+  int* editedVar = (int*) context;
+  Vector2 pos = *((Vector2*) args);
+
+  if (pos.x >= 10) {
+    *editedVar = 1; 
+  }
+}
+
+
+void testBudgetGameLoop() {
   EngineClock_init();
 
   Player playerStruct;
   Player* newPlayer = &playerStruct;
   Player_init(newPlayer, "Aleksandr");
+
+  int editedVar = 0;
+  Signal_Connect(newPlayer->moved, &testEvent, &editedVar);
 
   initscr();
   cbreak();
@@ -39,19 +52,22 @@ void testEngineClock() {
   nodelay(stdscr, TRUE);
   curs_set(0);
 
-  // double timeToElapse = 1 - .001f;
-  // while (timeElapsed() < timeToElapse) {
   while (1) {
-    double dt = waitForNextFrame();
+    clear();
+    double dt = EngineClock_waitForNextFrame();
     char input = get_wasd_input();
     Player_handleInput(newPlayer, input);
     Player_updateMovement(newPlayer, dt);
 
-    clear();
-    mvprintw(0, 0, "Time Elapsed: %.2lfs", timeElapsed());
+    mvprintw(0, 0, "Time Elapsed: %.2lfs", EngineClock_getTimeElapsed());
     mvprintw(1, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
     mvprintw(2, 0, "dt=%lf | TPS=%.2f\n", dt, 1/dt);
-    mvprintw(3,0, "Current input: %c", input);
+    mvprintw(3, 0, "Current input: %c", input);
+
+    if (editedVar) {
+      mvprintw(4, 0, "Player x position has passed 10!!");
+    }
+
     refresh();
   }
 
@@ -60,5 +76,5 @@ void testEngineClock() {
 
 int main(){
 	// loadRawImage("assets/testsprite.txt");
-  testEngineClock();
+  testBudgetGameLoop();
 }

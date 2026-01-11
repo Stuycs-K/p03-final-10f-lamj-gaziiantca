@@ -30,9 +30,11 @@ LinkedList* LinkedList_new() {
 
 Node* LinkedList_insertFront(LinkedList* list, void* entry) {
   Node* newFront = createNode(entry);
-
   Node* oldFront = list->front;
   list->front = newFront;
+  if (!oldFront) {
+    list->end = newFront;
+  }
 
   connectNodes(newFront, oldFront);
   return newFront;
@@ -40,9 +42,11 @@ Node* LinkedList_insertFront(LinkedList* list, void* entry) {
 
 Node* LinkedList_insertEnd(LinkedList* list, void* entry) {
   Node* newEnd = createNode(entry);
-
   Node* oldEnd = list->end;
   list->end = newEnd;
+  if (!oldEnd) {
+    list->front = newEnd;
+  }
 
   connectNodes(oldEnd, newEnd);
   return newEnd;
