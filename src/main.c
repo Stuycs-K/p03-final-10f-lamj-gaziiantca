@@ -44,11 +44,11 @@ void testRawImageCompression(char* path){
 	u64 time; 
 	time = getTime();
 	hdCompressedImage* cimg = compressRawImage(img, NULL);
-	printf("Compressing image took %lu ms\n", getTime() - time);
+	printf("Compressing image took %lu ms\n", (getTime() - time) / 1000);
 	printf("uncompressing image\n");
 	time = getTime();
 	hdRawImage* img2 = uncompressImage(cimg);
-	printf("uncompressing image took %lu ms\n", getTime() - time);
+	printf("uncompressing image took %lu ms\n", (getTime() - time) / 1000);
 
 	printf("comparing the images\n");
 	for(int y=0; y<img2->size_y; y++){
@@ -70,7 +70,7 @@ void testRawImageCompression(char* path){
 
 	time = getTime();
 	hdCompressedImage* cimg2 = readCompressedImage("temp.compimg", NULL);
-	printf("Reading took %lu ms\n", getTime()-time);
+	printf("Reading took %lu ms\n", (getTime()-time) / 1000);
 	
 	printf("Uncompressing the read image\n");
 	hdRawImage* img3 = uncompressImage(cimg2);
@@ -92,7 +92,7 @@ void testRawImageCompression(char* path){
 
 	time = getTime();
 	hdCompressedImage* cimg3 = readCompressedImage("temp.compimg", cimg->palette);
-	printf("Reading took %lu ms\n", getTime() - time);
+	printf("Reading took %lu ms\n", (getTime() - time) / 1000);
 
 	printf("Comparing uncompressed with original\n"); 
 	hdRawImage* img4 = uncompressImage(cimg3);
