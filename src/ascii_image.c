@@ -354,6 +354,7 @@ void nukePalette(hdPixelPalette* palette){
 
 void cleanupCompressedImage(hdCompressedImage* img){ //notably doesn't nuke the palette. 
 	free(img->items);
+	free(img);
 }
 
 void nukeCompressedImage(hdCompressedImage* img){

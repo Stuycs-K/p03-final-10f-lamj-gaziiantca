@@ -115,10 +115,9 @@ void testRawImageCompression(char* path){
 	nukeRawImage(img3);
 	nukeRawImage(img4);
 	
-	//nukePalette(cimg->palette); //this gets implicitly run by nuke
-	nukeCompressedImage(cimg);
+	nukeCompressedImage(cimg); //this will run nukePalette(cimg->palette)
 	nukeCompressedImage(cimg2); 
-	cleanupCompressedImage(cimg3); //If I were to run nuke, I would free the palette twice, which is undefined behaviour.
+	cleanupCompressedImage(cimg3); //Since cimg3 was created by reusing the palette from cimg, if I were to run nuke I would free the palette twice, which is undefined behaviour. Therefore I use cleanupCompressedImage which does NOT free the palette.
 
 }
 

@@ -57,3 +57,13 @@ made functions that make the pixels work with the hashmap library I imported
 - spent 30 minutes debugging said compression only to find out my print statement was printing the wrong variables :D
 
 - made functional compression
+
+### 2026-01-10
+
+- Improved the compression to not break with larger images 
+
+- Made functions for writing and reading compressed image files 
+
+- Wrote proper documentation in the header 
+
+- Finished pretty much everything related to images as far as I know as of time of writing this 
