@@ -215,6 +215,7 @@ hdCompressedImage* compressRawImage(const hdRawImage* img, hdPixelPalette* palet
 			//printf("Curr pixel (count: %d) (%hhu, %hhu, %hhu, %c)\n", stamp.count, p2.r, p2.g, p2.b, p2.c);
 		}
 	}
+	
 	return out;
 	
 }
@@ -233,4 +234,31 @@ hdRawImage* uncompressImage(const hdCompressedImage* img){
 	}
 	out->arr = f_arr.items;
 	return out;
+}
+
+void writeCompressedImage(hdCompressedImage* img, char* path){
+	int f = open(path, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	if(f < 0) err(path);
+	int bytes;
+	bytes = write(f, &img->size_x, sizeof(img->size_x));
+	if(bytes < 0) err("Writing compressed image size x");
+	bytes = write(f, &img->size_y, sizeof(img->size_y));
+	if(bytes < 0) err("Writing compressed image size y");
+	bytes = write(f, &img->count, sizeof(img->count));
+	if(bytes < 0) err("Writing compressed image count"); 
+	bytes = write(f, img->items, sizeof(*img->items) * img->count);
+	if(bytes < 0) {
+		char* errstr = (char*)(malloc(200)); 
+		sprintf(errstr, "Writing compressed image arr %p of size %d", img->items, img->count);
+		err(errstr);
+	}
+	bytes = write(f, &img->palette->count, sizeof(img->palette->count)); 
+	if(bytes < 0) err("Writing compresed image palette count"); 
+	bytes = write(f, &img->palette->items, sizeof(*img->palette->items) * img->palette->count);
+	if(bytes < 0) {
+		char* errstr = (char*)(malloc(200)); 
+		sprintf(errstr, "Writing palette arr %p of size %d", img->items, img->count);
+		err(errstr);
+	}
+	close(f);
 }

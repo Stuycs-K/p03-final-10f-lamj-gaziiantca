@@ -9,4 +9,5 @@ uint64_t pixel_hash(const void* item, u64 seed0, u64 seed1);
 int pixel_compare(const void* a, const void* b, void *udata);
 hdCompressedImage* compressRawImage(const hdRawImage* img, hdPixelPalette* palette);
 hdRawImage* uncompressImage(const hdCompressedImage* img);
+void writeCompressedImage(hdCompressedImage* img, char* path);
 #endif

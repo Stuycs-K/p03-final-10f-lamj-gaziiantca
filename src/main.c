@@ -57,6 +57,8 @@ void testRawImageCompression(char* path){
 		}
 		//printf("\n");
 	}
+	printf("Writing the image\n");
+	writeCompressedImage(cimg, "temp.compimg");
 	printf("Test passed\n");
 }
 
