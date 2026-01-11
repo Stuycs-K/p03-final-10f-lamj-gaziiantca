@@ -7,10 +7,10 @@ SRC = src
 CFLAGS = -lncurses -I$(INCLUDE) -DNDEBUG -lm
 
 
-_OBJS = main.o ascii_image.o engine_clock.o player.o vector2.o hashmap.o
+_OBJS = main.o ascii_image.o engine_clock.o player.o vector2.o hashmap.o screen.o
 OBJS = $(patsubst %, $(BUILD)/%, $(_OBJS))
 
-_HEADERS = ascii_image.h engine_clock.h player.h types.h vector2.h hashmap.h
+_HEADERS = ascii_image.h engine_clock.h player.h types.h vector2.h hashmap.h screen.h
 HEADERS = $(patsubst %, $(INCLUDE)/%, $(_HEADERS))
 
 

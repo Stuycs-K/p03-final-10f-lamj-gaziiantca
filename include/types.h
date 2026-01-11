@@ -18,13 +18,13 @@ typedef struct pixel {
 	//please no padding mr c
 } __attribute__((packed)) hdPixel; //NO PADDING MR GCC THANK YOU 
 
-typedef struct rawImage {
+typedef struct rawImage { //this is what images are stored with in the screen 
 	u16 size_x; 
 	u16 size_y; 
 	hdPixel* arr; //hd stands for header btw
 } hdRawImage;
 
-typedef struct compressedPixel {
+typedef struct compressedPixel { 
 	u16 count; 
 	u32 pos; // :(
 } __attribute__((packed))  hdCompressedPixel; 
@@ -43,7 +43,7 @@ typedef struct thepalwhoate {
 	//side note but holy moly computer scientists need to stop using the word "map" this is getting riduculous (this comment no longer makes contextual sense due to a renaming however my point still stands independently of it)
 } hdPixelPalette;
 
-typedef struct compressedImage {
+typedef struct compressedImage { //this is what images are stored with in the game files
 	u16 size_x; 
 	u16 size_y; 
 	hdCompressedPixel* items;
@@ -51,6 +51,27 @@ typedef struct compressedImage {
 	u32 count;
 	hdPixelPalette* palette;
 } hdCompressedImage;
+
+typedef struct sprite {
+	hdRawImage* image;
+	u16 pos_x;
+	u16 pos_y; 
+	void* extra; //I don't think this is useful to my purposes but since this is a library the user may want to store extra info
+} hdSprite;
+
+typedef struct camera {
+	u16 pos_x; 
+	u16 pos_y; 
+	double theta; //Potential trolling for the future
+} hdCamera;
+
+typedef struct hdScreen { 
+	//This doesn't store y and x sizes because those may change at runtime and ncurses will tell you that infinitely more accurately than I can ever dream of 
+	u32 count;
+	u32 capacity; 
+	hdRawImage* items;
+	
+} hdScreen;
 
 
 #endif
