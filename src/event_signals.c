@@ -1,31 +1,44 @@
 #include "event_signals.h"
+#include "linked_list.h"
 
-void Signal_Fire(Signal* self, void* arg) {
+#include <stdlib.h>
+
+Signal* Signal_new() {
+  Signal* newSignal = (Signal*) malloc(sizeof(Signal));
+  newSignal->connections = LinkedList_new();
+
+  return newSignal;
+}
+
+#include <ncurses.h>
+void Signal_Fire(Signal* self, void* args) {
   LinkedList* connections = self->connections;
   Node* current = connections->front;
 
   while (current) {
     Connection* currentConn = current->entry;
-    currentConn->callback(arg);
+    currentConn->callback(currentConn->context, args);
+
     if (currentConn->mode == LISTEN_ONCE) {
-      LinkedList_deleteNode(self, currentConn->connectionNode);
+      Connection_Disconnect(currentConn);
     }
-    current = current->next
+    current = current->next;
   }
 }
 
-Connection* Signal_Connect(Signal* self, SignalCallback callback) {
+Connection* Signal_Connect(Signal* self, SignalCallback callback, void* context) {
   Connection* newConn = (Connection*) malloc(sizeof(Connection));
   newConn->parent = self;
   newConn->connectionNode = LinkedList_insertEnd(self->connections, newConn);
   newConn->callback = callback;
+  newConn->context = context;
   newConn->mode = NO_MODE;
 
   return newConn;
 }
 
-Connection* Signal_ConnectOnce(Signal* self, SignalCallback callback) {
-  Connection* newConn = Signal_Connect(self, callback);
+Connection* Signal_ConnectOnce(Signal* self, SignalCallback callback, void* context) {
+  Connection* newConn = Signal_Connect(self, callback, context);
   newConn->mode = LISTEN_ONCE;
 
   return newConn;
@@ -33,4 +46,5 @@ Connection* Signal_ConnectOnce(Signal* self, SignalCallback callback) {
 
 void Connection_Disconnect(Connection* self) {
   LinkedList_deleteNode(self->parent->connections, self->connectionNode);
+  free(self);
 }
