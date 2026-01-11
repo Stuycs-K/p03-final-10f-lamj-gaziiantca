@@ -53,7 +53,7 @@ typedef struct compressedImage { //this is what images are stored with in the ga
 } hdCompressedImage;
 
 typedef struct sprite {
-	hdRawImage* image;
+	hdRawImage* image; //can technically re-use sprites
 	u16 pos_x;
 	u16 pos_y; 
 	void* extra; //I don't think this is useful to my purposes but since this is a library the user may want to store extra info
@@ -62,15 +62,16 @@ typedef struct sprite {
 typedef struct camera {
 	u16 pos_x; 
 	u16 pos_y; 
-	double theta; //Potential trolling for the future
+	double theta; //just for fun)
 } hdCamera;
 
 typedef struct hdScreen { 
-	//This doesn't store y and x sizes because those may change at runtime and ncurses will tell you that infinitely more accurately than I can ever dream of 
+	u16 size_x; 
+	u16 size_y; //Important note: while this struct does store size_x and size_y, it is only updated during the draw call, so if you need screen size for anything else use getmaxyx(). Treat these like private variables basically. 
 	u32 count;
 	u32 capacity; 
-	hdRawImage* items;
-	
+	hdSprite* items;
+	hdCamera* camera;
 } hdScreen;
 
 
