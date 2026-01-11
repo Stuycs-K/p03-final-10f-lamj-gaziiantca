@@ -29,7 +29,7 @@ typedef struct dFragArr {
 	u32 capacity;
 } dFragArr; 
 
-void err(char* str){
+void err(const char* str){
 	if(str != NULL){
 		printf("%s", str); 
 	}
@@ -37,7 +37,7 @@ void err(char* str){
 }
 
 
-hdRawImage* loadRawImage(char* path){ //important note: i will not make this run fast because this is something that should be run once ever per image. whatever game this is used for should not call this. this is a tool for development. not for game. ok.
+hdRawImage* loadRawImage(const char* path){ //important note: i will not make this run reasonably fast because this is something that should be run once ever per image. whatever game this is used for should not call this. this is a tool for development. not for game. 
 	hdRawImage* out = (hdRawImage*)(malloc(sizeof(hdRawImage)));
 	
 	FILE* f = fopen(path, "r");
@@ -93,7 +93,7 @@ fortyeight:
 	return out;
 }
 
-void writeRawImage(hdRawImage* img, char* path) {
+void writeRawImage(const hdRawImage* img, const char* path) {
 	int f = open(path, O_WRONLY | O_TRUNC | O_CREAT, 0644); 
 	if(f < 0) err(path);
 	int bytes; 
@@ -111,7 +111,7 @@ void writeRawImage(hdRawImage* img, char* path) {
 #endif
 	}
 
-hdRawImage* readRawImage(char* path){
+hdRawImage* readRawImage(const char* path){
 	int f = open(path, O_RDONLY, 0); 
 	if(f < 0) err(path);
 	int bytes;  
@@ -148,7 +148,7 @@ uint64_t pixel_hash(const void* item, u64 seed0, u64 seed1){
 	return hashmap_sip(p->pixel, sizeof(*p->pixel), seed0, seed1);
 }
 
-int addPixelToSymtab(hdHashEntry* in, hdCompressedImage* img){ //in has to be a pointer for the hash get :( 
+int addPixelToSymtab(hdHashEntry* in, const hdCompressedImage* img){ //in has to be a pointer for the hash get :( 
 	const hdHashEntry* result; 
 	hdPixel p2 = *in->pixel;
 	//printf("symtab adding (%hhu, %hhu, %hhu, %c)\n", p2.r, p2.g, p2.b, p2.c);
@@ -177,7 +177,7 @@ int addPixelToSymtab(hdHashEntry* in, hdCompressedImage* img){ //in has to be a 
 
 #define pixelCmp(p1, p2) (p1.r==p2.r && p1.g==p2.g && p1.b==p2.b && p1.c==p2.c)
 
-hdCompressedImage* compressRawImage(hdRawImage* img, hdPixelPalette* palette){
+hdCompressedImage* compressRawImage(const hdRawImage* img, hdPixelPalette* palette){
 	hdCompressedImage* out = (hdCompressedImage*) (calloc(sizeof(hdCompressedImage), 1));
 	out->size_x = img->size_x;
 	out->size_y = img->size_y; 
@@ -190,8 +190,9 @@ hdCompressedImage* compressRawImage(hdRawImage* img, hdPixelPalette* palette){
 	out->palette = palette;
 	hdPixel p1 = img->arr[0];
 	hdPixel p2;
-	hdCompressedPixel stamp = { .count = 1};
+	hdCompressedPixel stamp = { .count = 0};
 	hdHashEntry* entry = &(hdHashEntry) { .pixel = &p1 };
+	stamp.pos = addPixelToSymtab(entry, out);
 	for(int y=0; y<out->size_y; y++){
 		for(int x=0; x<out->size_x; x++){
 			p2 = img->arr[y * img->size_x + x];
@@ -200,14 +201,36 @@ hdCompressedImage* compressRawImage(hdRawImage* img, hdPixelPalette* palette){
 				pointer_da_append(out, stamp);
 				stamp.count = 0;
 				entry->pixel = &p2;
-				
 				stamp.pos = addPixelToSymtab(entry, out);
 			}
 			stamp.count++;
+			if(stamp.count > 60000){
+				printf("Stamp count in sus territories\n");
+			}
+			if(palette->count > 1000000000){
+				printf("palette items in sus territories\n");
+			}
+			//printf("%d\n", stamp.count);
 			//printf("palette item at stamp pos (count: %d) (%hhu, %hhu, %hhu, %c), alt rep: %d\n", stamp.count, palette->items[stamp.pos].r, palette->items[stamp.pos].g, palette->items[stamp.pos].b, palette->items[stamp.pos].c, palette->items[stamp.pos]);
 			//printf("Curr pixel (count: %d) (%hhu, %hhu, %hhu, %c)\n", stamp.count, p2.r, p2.g, p2.b, p2.c);
 		}
 	}
 	return out;
 	
+}
+
+hdRawImage* uncompressImage(const hdCompressedImage* img){
+	hdRawImage* out = (hdRawImage*) (malloc(sizeof(hdRawImage)));
+	out->size_x = img->size_x;
+	out->size_y = img->size_y;
+	out->arr = (hdPixel*) (malloc(sizeof(hdPixel) * out->size_x * out->size_y));
+	dFragArr f_arr = {0};
+
+	for(int i=0; i<img->count; i++){
+		for(int j=0; j<img->items[i].count; j++){
+			da_append(f_arr, img->palette->items[img->items[i].pos]);
+		}
+	}
+	out->arr = f_arr.items;
+	return out;
 }

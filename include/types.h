@@ -26,12 +26,12 @@ typedef struct rawImage {
 
 typedef struct compressedPixel {
 	u16 count; 
-	u16 pos; 
+	u32 pos; // :(
 } hdCompressedPixel; 
 
 typedef struct hashmapentrybroidkatp {
 	hdPixel* pixel; 
-	u16 pos;
+	u32 pos;
 } hdHashEntry;
 
 typedef struct thepalwhoate {

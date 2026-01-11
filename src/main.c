@@ -39,7 +39,25 @@ void testRawImageReadingAndWriting(char* path){
 
 void testRawImageCompression(char* path){
 	hdRawImage* img = loadRawImage(path);
+	printf("compressing image\n");
 	hdCompressedImage* cimg = compressRawImage(img, NULL);
+	printf("uncompressing image\n");
+	hdRawImage* img2 = uncompressImage(cimg);
+	printf("comparing the images\n");
+	for(int y=0; y<img2->size_y; y++){
+		for(int x=0; x<img2->size_x; x++){
+			hdPixel* p1 = &img2->arr[y * img->size_x + x];
+			hdPixel* p2 = &img->arr[y * img->size_x + x];
+			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
+			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
+			if(p1->r != p2->r){
+				printf("sus (%d,%d) %d vs %d\n", x, y, p1->r, p2->r);
+				return;
+			}
+		}
+		//printf("\n");
+	}
+	printf("Test passed\n");
 }
 
 void testHashing(){
@@ -131,7 +149,7 @@ void testEngineClock() {
 
 int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
-	testRawImageCompression("assets/smallsus.txt");
+	testRawImageCompression("assets/big.texture");
 	//testHashing();
 	
   //testEngineClock();
