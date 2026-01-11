@@ -67,3 +67,7 @@ made functions that make the pixels work with the hashmap library I imported
 - Wrote proper documentation in the header 
 
 - Finished pretty much everything related to images as far as I know as of time of writing this 
+
+### 2026-01-11
+
+- Very basic screen functionality 
