@@ -23,11 +23,11 @@ uint64_t getTime() { //returns microseconds
   return ((uint64_t)ts.tv_sec * micros_per_second) + ((uint64_t)ts.tv_nsec / 1e3);
 }
 
-double timeElapsed() {
+double EngineClock_getTimeElapsed() {
   return ((double) latestFrameTime - startTime) / micros_per_second;
 }
 
-double waitForNextFrame() {
+double EngineClock_waitForNextFrame() {
   uint64_t currentTime = getTime();
   uint64_t nextFrameTime = latestFrameTime + micros_per_second / baseTPS;
 

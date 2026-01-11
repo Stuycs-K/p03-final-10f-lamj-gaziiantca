@@ -6,14 +6,14 @@
   #include <unistd.h>
 
   #define baseTPS 60
-  #define usleepError 200
+  #define usleepError 500
   #define micros_per_second 1e6
 
   void EngineClock_init();
   void setTPS(int newTPS);
   uint64_t getTime();
 
-  double timeElapsed();
-  double waitForNextFrame();
+  double EngineClock_getTimeElapsed();
+  double EngineClock_waitForNextFrame();
 
 #endif
