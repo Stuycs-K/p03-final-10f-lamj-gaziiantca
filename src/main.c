@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 #include <ncurses.h>
 #include "hashmap.h"
@@ -40,9 +41,15 @@ void testRawImageReadingAndWriting(char* path){
 void testRawImageCompression(char* path){
 	hdRawImage* img = loadRawImage(path);
 	printf("compressing image\n");
+	u64 time; 
+	time = getTime();
 	hdCompressedImage* cimg = compressRawImage(img, NULL);
+	printf("Compressing image took %lu ms\n", getTime() - time);
 	printf("uncompressing image\n");
+	time = getTime();
 	hdRawImage* img2 = uncompressImage(cimg);
+	printf("uncompressing image took %lu ms\n", getTime() - time);
+
 	printf("comparing the images\n");
 	for(int y=0; y<img2->size_y; y++){
 		for(int x=0; x<img2->size_x; x++){
@@ -59,7 +66,60 @@ void testRawImageCompression(char* path){
 	}
 	printf("Writing the image\n");
 	writeCompressedImage(cimg, "temp.compimg");
-	printf("Test passed\n");
+	printf("Reading the image\n");
+
+	time = getTime();
+	hdCompressedImage* cimg2 = readCompressedImage("temp.compimg", NULL);
+	printf("Reading took %lu ms\n", getTime()-time);
+	
+	printf("Uncompressing the read image\n");
+	hdRawImage* img3 = uncompressImage(cimg2);
+	printf("Comparing the image after reading with the original image\n");
+	for(int y=0; y<img3->size_y; y++){
+		for(int x=0; x<img3->size_x; x++){
+			hdPixel* p1 = &img3->arr[y * img->size_x + x];
+			hdPixel* p2 = &img->arr[y * img->size_x + x];
+			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
+			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
+			if(p1->r != p2->r){
+				printf("sus (%d,%d) %d vs %d\n", x, y, p1->r, p2->r);
+				return;
+			}
+		}
+		//printf("\n");
+	}
+	printf("Now reading the image while re-using the palette from the old image\n");
+
+	time = getTime();
+	hdCompressedImage* cimg3 = readCompressedImage("temp.compimg", cimg->palette);
+	printf("Reading took %lu ms\n", getTime() - time);
+
+	printf("Comparing uncompressed with original\n"); 
+	hdRawImage* img4 = uncompressImage(cimg3);
+	for(int y=0; y<img4->size_y; y++){
+		for(int x=0; x<img4->size_x; x++){
+			hdPixel* p1 = &img4->arr[y * img->size_x + x];
+			hdPixel* p2 = &img->arr[y * img->size_x + x];
+			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
+			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
+			if(p1->r != p2->r){
+				printf("sus (%d,%d) %d vs %d\n", x, y, p1->r, p2->r);
+				return;
+			}
+		}
+		//printf("\n");
+	}
+
+	nukeRawImage(img); 
+	nukeRawImage(img2);
+	nukeRawImage(img3);
+	nukeRawImage(img4);
+	
+	//nukePalette(cimg->palette); //this gets implicitly run by nuke
+	nukeCompressedImage(cimg);
+	nukeCompressedImage(cimg2); 
+	cleanupCompressedImage(cimg3); //If I were to run nuke, I would free the palette twice, which is undefined behaviour.
+
 }
 
 void testHashing(){
@@ -153,6 +213,5 @@ int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	testRawImageCompression("assets/big.texture");
 	//testHashing();
-	
   //testEngineClock();
 }

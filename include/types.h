@@ -40,7 +40,7 @@ typedef struct thepalwhoate {
 	hdPixel* items;
 	struct hashmap *hashmap; 
 	//the map will contain the pixels pointing to the indices of said pixels in arr
-	//side note but holy moly computer scientists need to stop using the word "map" this is getting riduculous
+	//side note but holy moly computer scientists need to stop using the word "map" this is getting riduculous (this comment no longer makes contextual sense due to a renaming however my point still stands independently of it)
 } hdPixelPalette;
 
 typedef struct compressedImage {

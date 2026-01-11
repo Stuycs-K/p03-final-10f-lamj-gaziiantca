@@ -345,3 +345,18 @@ hdCompressedImage* readCompressedImage(const char* path, hdPixelPalette* palette
 	return out;
 	
 }
+
+void nukePalette(hdPixelPalette* palette){
+	hashmap_free(palette->hashmap);
+	free(palette->items);
+	free(palette);
+}
+
+void cleanupCompressedImage(hdCompressedImage* img){ //notably doesn't nuke the palette. 
+	free(img->items);
+}
+
+void nukeCompressedImage(hdCompressedImage* img){
+	nukePalette(img->palette); 
+	cleanupCompressedImage(img);
+}
