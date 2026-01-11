@@ -40,7 +40,7 @@ hdScreen* initScreen(){
 }
 
 int get_color(hdPixel p){
-	//I am going to fucking lose it why does ncurses not support rgb normally??? 
+	//why does ncurses not support rgb normally??? why are we still here??? just to suffer??????
 	if(p.r == p.g && p.g == p.b){
 		if(p.r < 8) return 16;
 		if(p.r > 248) return 231; 
@@ -55,9 +55,9 @@ int get_color(hdPixel p){
 void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 	i32 x = sprite->pos_x - screen->camera->pos_x;
 	i32 y = sprite->pos_y - screen->camera->pos_y; //doing the rcs thingamabob for easy rotation formula
-	/* 0,0 - 1,0
-	 * |	  |
-	 * 0,1 - 1,1
+	/* -1,-1 === 1,-1
+	 * |    0,0   |
+	 * -1,1 ===  1,1
 	 this thing^ */
 	double theta = screen->camera->theta; 
 	i32 l_x = screen->camera->pos_x - (screen->size_x / 2);
@@ -67,10 +67,19 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 	//ncurses should handle this stuff automatically but still doing it just in case
 	int pos_x, pos_y;
 	hdPixel p;
+	int i = 0; int sj = 0;
+	int mi = sprite->image->size_y; 
+	int mj = sprite->image->size_x; 
+	if(l_x > x) sj = l_x-x;
+	if(r_x <= x+mj) mj = r_x-x; //mj = mj-(x-r_x+mj);	
+	if(t_y > y) i = t_y-y;
+	if(b_y < y+mi) mi = b_y-y;
+	
+	if(mj < sj || mj < 0 || mi < i || i < 0) return;
 
-	for(int i=0; i<sprite->image->size_y; i++){
-		for(int j=0; j<sprite->image->size_x; j++){
-			mvprintw(20, 0, "(%d %d)", pos_x, pos_y);
+	//mvprintw(20, 0, "(%d %d - %d %d) [%d %d %d %d] [%d-%d %d-%d]", x, y, x + sprite->image->size_x, y + sprite->image->size_y, l_x, r_x, t_y, b_y, i, mi, sj, mj);
+	for(; i<mi; i++){
+		for(int j=sj; j<mj; j++){
 			if(theta != 0){
 				pos_x = pos_x * cos(theta) - pos_y * sin(theta);
 				pos_y = pos_y * sin(theta) + pos_y * cos(theta);
@@ -79,13 +88,11 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 				pos_x = x + j; 
 				pos_y = y + i;
 			}
-			if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
+			/*if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
 				continue;
-			}
+			}*/
 			p = sprite->image->arr[i * sprite->image->size_x + j];
 			if(p.c == ' ') continue;
-			//init_color(CUSTOM_COLOR, p.r * COLOR_CONVERTER_3000, p.g * COLOR_CONVERTER_3000, p.b * COLOR_CONVERTER_3000); //if only there was an easier way to do this :(
-			//printf("(%hhu %hhu %hhu)\n", p.r, p.g, p.b);
 			int cid = get_color(p);
 			attron(COLOR_PAIR(cid));
 			mvaddch(pos_y, pos_x, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
