@@ -35,7 +35,17 @@ void err(const char* str){
 	}
 	printf(" | %s\n", strerror(errno));
 }
+void err2(const char* str, const char* str2){ 
+	if(str != NULL){
+		printf("%s", str); 
+	}
+	if(str2 != NULL){
+		printf(" %s", str2); 
+	}
+	printf(" | %s\n", strerror(errno));
+}
 
+u8 writeReadDebug = 0;
 
 hdRawImage* loadRawImage(const char* path){ //important note: i will not make this run reasonably fast because this is something that should be run once ever per image. whatever game this is used for should not call this. this is a tool for development. not for game. 
 	hdRawImage* out = (hdRawImage*)(malloc(sizeof(hdRawImage)));
@@ -236,29 +246,102 @@ hdRawImage* uncompressImage(const hdCompressedImage* img){
 	return out;
 }
 
-void writeCompressedImage(hdCompressedImage* img, char* path){
+void writeCompressedImage(const hdCompressedImage* img, const char* path){
 	int f = open(path, O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if(f < 0) err(path);
 	int bytes;
+	int tbytes = 0;
+
 	bytes = write(f, &img->size_x, sizeof(img->size_x));
-	if(bytes < 0) err("Writing compressed image size x");
+	if(bytes < 0) err2("Writing compressed image size x", path);
+	tbytes += bytes;
+
 	bytes = write(f, &img->size_y, sizeof(img->size_y));
-	if(bytes < 0) err("Writing compressed image size y");
+	if(bytes < 0) err2("Writing compressed image size y", path);
+	tbytes += bytes;
+
 	bytes = write(f, &img->count, sizeof(img->count));
-	if(bytes < 0) err("Writing compressed image count"); 
+	if(bytes < 0) err2("Writing compressed image count", path); 
+	tbytes += bytes;
+
 	bytes = write(f, img->items, sizeof(*img->items) * img->count);
-	if(bytes < 0) {
+	if(bytes < 0 || writeReadDebug) {
+		if(writeReadDebug) printf("%d\n", *img->items);
 		char* errstr = (char*)(malloc(200)); 
-		sprintf(errstr, "Writing compressed image arr %p of size %d", img->items, img->count);
+		sprintf(errstr, "Writing compressed image arr %p of size %d, %d bytes", img->items, img->count, bytes);
 		err(errstr);
 	}
+	tbytes += bytes;
+
 	bytes = write(f, &img->palette->count, sizeof(img->palette->count)); 
-	if(bytes < 0) err("Writing compresed image palette count"); 
-	bytes = write(f, &img->palette->items, sizeof(*img->palette->items) * img->palette->count);
-	if(bytes < 0) {
+	if(bytes < 0) err2("Writing compresed image palette count", path); 
+	tbytes += bytes;
+	
+	bytes = write(f, img->palette->items, sizeof(*img->palette->items) * img->palette->count);
+	if(bytes < 0 || writeReadDebug) {
+		if(writeReadDebug) printf("%d\n", *img->palette->items);
 		char* errstr = (char*)(malloc(200)); 
-		sprintf(errstr, "Writing palette arr %p of size %d", img->items, img->count);
+		sprintf(errstr, "Writing palette arr %p of size %d, %d bytes", img->palette->items, img->palette->count, bytes);
 		err(errstr);
 	}
+	tbytes += bytes;
+
 	close(f);
+	if(writeReadDebug) printf("Wrote %d bytes\n", tbytes);
+}
+
+hdCompressedImage* readCompressedImage(const char* path, hdPixelPalette* palette){ //palette arg just for fun yk
+	hdCompressedImage* out = (hdCompressedImage*) (malloc(sizeof(hdCompressedImage)));
+	int f = open(path, O_RDONLY, 0);
+	if(f < 0) err(path); 
+	int bytes;
+	int tbytes = 0;
+
+	bytes = read(f, &out->size_x, sizeof(out->size_x));
+	if(bytes < 0) err2("Reading size_x of compressed image", path);
+	tbytes += bytes;
+
+	bytes = read(f, &out->size_y, sizeof(out->size_y));
+	if(bytes < 0) err2("Reading size_y of compressed image", path);
+	tbytes += bytes;
+
+	bytes = read(f, &out->count, sizeof(out->count));
+	if(bytes < 0) err2("Reading count of compressed image", path);
+	tbytes += bytes;
+
+
+	out->items = (hdCompressedPixel*) (malloc(sizeof(*out->items) * out->count));
+	bytes = read(f, out->items, sizeof(*out->items) * out->count);
+	if(bytes < 0 || writeReadDebug) {
+		if(writeReadDebug) printf("%d\n", *out->items);
+		char* errstr = (char*)(malloc(200)); 
+		sprintf(errstr, "Reading compressed image arr %p of size %d, %d bytes", out->items, out->count, bytes);
+		err(errstr);
+	}
+	tbytes += bytes;
+
+	if(palette != NULL){
+		out->palette = palette;
+	}else{
+		out->palette = (hdPixelPalette*) (calloc(sizeof(hdPixelPalette), 1)); //zero-d out just in case
+
+		bytes = read(f, &out->palette->count, sizeof(out->palette->count));
+		if(bytes < 0) err2("Reading compressed image palette count", path);
+
+		tbytes += bytes;
+
+		out->palette->items = (hdPixel*)(malloc(sizeof(*out->palette->items) * out->palette->count));
+		bytes = read(f, out->palette->items, sizeof(*out->palette->items) * out->palette->count);
+		if(bytes < 0 || writeReadDebug) {
+			if(writeReadDebug) printf("%d\n", *out->palette->items);
+			char* errstr = (char*)(malloc(200)); 
+			sprintf(errstr, "Reading palette arr %p of size %d, %d bytes", out->palette->items, out->palette->count, bytes); //ok the bytes will always be -1 but just remove the if statement to see this info,, 
+			err(errstr);
+		}
+		tbytes += bytes;
+	}
+	if(writeReadDebug) printf("Read %d bytes\n", tbytes);
+	close(f);
+	return out;
+	
 }

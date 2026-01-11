@@ -27,7 +27,7 @@ typedef struct rawImage {
 typedef struct compressedPixel {
 	u16 count; 
 	u32 pos; // :(
-} hdCompressedPixel; 
+} __attribute__((packed))  hdCompressedPixel; 
 
 typedef struct hashmapentrybroidkatp {
 	hdPixel* pixel; 
