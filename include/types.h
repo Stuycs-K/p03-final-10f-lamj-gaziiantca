@@ -54,14 +54,14 @@ typedef struct compressedImage { //this is what images are stored with in the ga
 
 typedef struct sprite {
 	hdRawImage* image; //can technically re-use sprites
-	u16 pos_x;
-	u16 pos_y; 
+	i16 pos_x;
+	i16 pos_y; 
 	void* extra; //I don't think this is useful to my purposes but since this is a library the user may want to store extra info
 } hdSprite;
 
 typedef struct camera {
-	u16 pos_x; 
-	u16 pos_y; 
+	i16 pos_x; 
+	i16 pos_y; 
 	double theta; //just for fun)
 } hdCamera;
 

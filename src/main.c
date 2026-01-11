@@ -8,7 +8,7 @@
 #include "engine_clock.h"
 #include "player.h"
 #include "ascii_image.h"
-
+#include "screen.h"
 
 void testRawImageReadingAndWriting(char* path){
 	hdRawImage* img = loadRawImage(path);
@@ -208,9 +208,31 @@ void testEngineClock() {
   exitGame(0);
 }
 
+void testScreen(char* path){
+	EngineClock_init(); 
+	Player playerStruct;
+	Player* newPlayer = &playerStruct; 
+	Player_init(newPlayer, "Jesse");
+
+	hdScreen* screen = initScreen();
+	addSprite(screen, initSprite(loadRawImage(path), NULL));
+	while(1){
+		double dt = waitForNextFrame();
+		char input = get_wasd_input(); 
+		Player_handleInput(newPlayer, input);
+		Player_updateMovement(newPlayer, dt*5);
+		screen->camera->pos_x = (int)newPlayer->pos.x;
+		screen->camera->pos_y = (int)newPlayer->pos.y;
+		draw(screen);
+		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+		refresh();
+	}
+}
+
 int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
-	testRawImageCompression("assets/big.texture");
+	//testRawImageCompression("assets/big.texture");
 	//testHashing();
+	testScreen("assets/smallsus.txt");
   //testEngineClock();
 }

@@ -7,8 +7,7 @@
 #include <ncurses.h>
 #include <math.h>
 
-#define CUSTOM_COLOR 100 
-#define COLOR_CONVERTER_3000 3.92
+//#define COLOR_CONVERTER_3000 3.92
 //god I love ncurses
 
 #define pointer_da_append(xs, x) \
@@ -21,7 +20,7 @@
 hdScreen* initScreen(){
 	hdScreen* out = (hdScreen*) (calloc(sizeof(hdScreen), 1));
 	out->camera = (hdCamera*) (calloc(sizeof(hdCamera), 1));
-	out->items = (hdRawImage*) (malloc(0)); //divine intellect code don't question it
+	out->items = (hdSprite*) (malloc(0)); //divine intellect code don't question it
 	initscr(); 
 	cbreak();
 	noecho();
@@ -34,9 +33,23 @@ hdScreen* initScreen(){
 		exit(1);
 	}
 	start_color();
-	init_color(CUSTOM_COLOR, 0, 0, 0);
-	init_pair(1, COLOR_WHITE, CUSTOM_COLOR);
+	for(int i=0; i<256; i++){
+		init_pair(i, COLOR_WHITE, i);
+	}
 	return out;
+}
+
+int get_color(hdPixel p){
+	//I am going to fucking lose it why does ncurses not support rgb normally??? 
+	if(p.r == p.g && p.g == p.b){
+		if(p.r < 8) return 16;
+		if(p.r > 248) return 231; 
+		return 232 + (int)((p.r-8) / 10.0);
+	}
+	int r6 = (p.r*5) / 255;
+	int g6 = (p.g*5) / 255; 
+	int b6 = (p.b*5) / 255;
+	return 16 + (36 * r6) + (6 * g6) + b6;
 }
 
 void drawSprite(const hdScreen* screen, const hdSprite* sprite){
@@ -57,6 +70,7 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 
 	for(int i=0; i<sprite->image->size_y; i++){
 		for(int j=0; j<sprite->image->size_x; j++){
+			mvprintw(20, 0, "(%d %d)", pos_x, pos_y);
 			if(theta != 0){
 				pos_x = pos_x * cos(theta) - pos_y * sin(theta);
 				pos_y = pos_y * sin(theta) + pos_y * cos(theta);
@@ -69,8 +83,14 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 				continue;
 			}
 			p = sprite->image->arr[i * sprite->image->size_x + j];
-			init_color(CUSTOM_COLOR, p.r * COLOR_CONVERTER_3000, p.g * COLOR_CONVERTER_3000, p.b * COLOR_CONVERTER_3000); //if only there was an easier way to do this :(
-			mvaddch(pos_x, pos_y, p.c);
+			if(p.c == ' ') continue;
+			//init_color(CUSTOM_COLOR, p.r * COLOR_CONVERTER_3000, p.g * COLOR_CONVERTER_3000, p.b * COLOR_CONVERTER_3000); //if only there was an easier way to do this :(
+			//printf("(%hhu %hhu %hhu)\n", p.r, p.g, p.b);
+			int cid = get_color(p);
+			attron(COLOR_PAIR(cid));
+			mvaddch(pos_y, pos_x, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
+			//mvprintw(pos_y, pos_x, "\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p.r, p.g, p.b, p.c);
+			attroff(COLOR_PAIR(cid));
 		}
 	}
 }
@@ -78,16 +98,23 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 void draw(hdScreen* screen){
 	erase();
 	getmaxyx(stdscr, screen->size_x, screen->size_y);
-	attron(COLOR_PAIR(1));
 	for(int i=0; i<screen->count; i++){
 		drawSprite(screen, &screen->items[i]);
 	}
-	attroff(COLOR_PAIR(1));
 	refresh();
 }
 
-void addSprite(hdScreen* screen, hdSprite* sprite){
+void addSprite(hdScreen* screen, const hdSprite* sprite){
 	pointer_da_append(screen, *sprite);
+}
+
+hdSprite* initSprite(hdRawImage* img, void* extra){
+	hdSprite* out = (hdSprite*) (malloc(sizeof(hdSprite)));
+	out->image = img; 
+	out->pos_x = 0;
+	out->pos_y = 0;
+	out->extra = extra;
+	return out;
 }
 
 void cleanupScreen(hdScreen* screen){
