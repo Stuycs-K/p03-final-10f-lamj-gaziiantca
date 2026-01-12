@@ -54,50 +54,59 @@ int get_color(hdPixel p){
 
 void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 	i32 x = sprite->pos_x - screen->camera->pos_x;
-	i32 y = sprite->pos_y - screen->camera->pos_y; //doing the rcs thingamabob for easy rotation formula
+	i32 y = sprite->pos_y + screen->camera->pos_y; //doing the rcs thingamabob for easy rotation formula
 	/* -1,-1 === 1,-1
 	 * |    0,0   |
 	 * -1,1 ===  1,1
 	 this thing^ */
 	double theta = screen->camera->theta; 
-	i32 l_x = screen->camera->pos_x - (screen->size_x / 2);
-	i32 r_x = screen->camera->pos_x + (screen->size_x / 2);
-	i32 t_y = screen->camera->pos_y - (screen->size_y / 2);
-	i32 b_y = screen->camera->pos_y + (screen->size_y / 2); 
+	i32 l_x = screen->camera->pos_x;
+	i32 r_x = screen->camera->pos_x + (screen->size_x);
+	i32 t_y = screen->camera->pos_y;
+	i32 b_y = screen->camera->pos_y + (screen->size_y); 
 	//ncurses should handle this stuff automatically but still doing it just in case
-	int pos_x, pos_y;
+	int c_x = l_x + r_x / 2;
+	int c_y = t_y + b_y / 2;
+	double pos_x, pos_y, pos2_x, pos2_y;
 	hdPixel p;
 	int i = 0; int sj = 0;
 	int mi = sprite->image->size_y; 
 	int mj = sprite->image->size_x; 
-	if(l_x > x) sj = l_x-x;
-	if(r_x <= x+mj) mj = r_x-x; //mj = mj-(x-r_x+mj);	
-	if(t_y > y) i = t_y-y;
-	if(b_y < y+mi) mi = b_y-y;
+	//if(l_x > x) sj = l_x-x;
+	//if(r_x <= x+mj) mj = r_x-x; //mj = mj-(x-r_x+mj);	
+	//if(t_y > y) i = t_y-y;
+	//if(b_y < y+mi) mi = b_y-y;
 	
-	if(mj < sj || mj < 0 || mi < i || i < 0) return;
+	//if(mj < sj || mj < 0 || mi < i || i < 0) return;
 
 	//mvprintw(20, 0, "(%d %d - %d %d) [%d %d %d %d] [%d-%d %d-%d]", x, y, x + sprite->image->size_x, y + sprite->image->size_y, l_x, r_x, t_y, b_y, i, mi, sj, mj);
 	for(; i<mi; i++){
 		for(int j=sj; j<mj; j++){
-			if(theta != 0){
-				pos_x = pos_x * cos(theta) - pos_y * sin(theta);
-				pos_y = pos_y * sin(theta) + pos_y * cos(theta);
-				
-			}else{
-				pos_x = x + j; 
+				pos_x = x + j;
 				pos_y = y + i;
-			}
-			/*if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
-				continue;
-			}*/
-			p = sprite->image->arr[i * sprite->image->size_x + j];
-			if(p.c == ' ') continue;
-			int cid = get_color(p);
-			attron(COLOR_PAIR(cid));
-			mvaddch(pos_y+screen->size_y / 2, pos_x+screen->size_x / 2, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
-			//mvprintw(pos_y, pos_x, "\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p.r, p.g, p.b, p.c);
-			attroff(COLOR_PAIR(cid));
+				if(theta != 0){
+					/*if(i==0 && j==0){
+						mvprintw(22, 0, "(%f %f) rotated over (%d %d) produces the following image:", pos_x, pos_y, screen->size_x / 2, screen->size_y / 2);
+					}*/
+					pos_x -= c_x;
+					pos_y -= c_y;
+					pos2_x = pos_x * cos(theta) - pos_y * sin(theta);
+					pos2_y = pos_x * sin(theta) + pos_y * cos(theta);
+				}else{
+					pos2_x = pos_x;
+					pos2_y = pos_y;
+				}
+				/*if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
+					continue;
+				}*/
+				p = sprite->image->arr[i * sprite->image->size_x + j];
+				if(p.c == ' ') continue;
+				int cid = get_color(p);
+				attron(COLOR_PAIR(cid));
+				mvaddch(pos2_y, pos2_x*2, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
+				mvaddch(pos2_y, pos2_x*2+1, p.c);
+				//mvprintw(pos_y, pos_x, "\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p.r, p.g, p.b, p.c);
+				attroff(COLOR_PAIR(cid));
 		}
 	}
 }
