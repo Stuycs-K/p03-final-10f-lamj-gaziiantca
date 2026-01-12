@@ -243,9 +243,11 @@ void testBudgetGameLoop() {
 
 void testScreen(char* path1, char* path2){
 	EngineClock_init(); 
-	Player playerStruct;
-	Player* newPlayer = &playerStruct; 
+	Player* newPlayer = (Player*) calloc(1, sizeof(Player)); 
 	Player_init(newPlayer, "Jesse");
+
+  MovedCtx* context = calloc(1, sizeof(MovedCtx));
+  Signal_Connect(newPlayer->moved, &testEvent, context);
 
 	hdScreen* screen = initScreen();
 	hdSprite* bg = initSprite(loadRawImage(path2), NULL);
@@ -260,7 +262,10 @@ void testScreen(char* path1, char* path2){
 		screen->camera->pos_x = round(newPlayer->pos.x);
 		screen->camera->pos_y = round(newPlayer->pos.y);
 		draw(screen);
-		//mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+    if (context->var) {
+      mvprintw(11, 0, "Player x position has passed 10!!");
+    }
 		refresh();
 	}
 }
@@ -269,7 +274,6 @@ int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/big.texture");
 	//testHashing();
-	// testScreen("assets/smallsus.txt", "assets/sus.txt");
-  testBudgetGameLoop();
-  //testEngineClock();
+	testScreen("assets/smallsus.txt", "assets/sus.txt");
+  // testBudgetGameLoop();
 }
