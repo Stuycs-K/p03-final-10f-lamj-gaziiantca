@@ -95,7 +95,7 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 			if(p.c == ' ') continue;
 			int cid = get_color(p);
 			attron(COLOR_PAIR(cid));
-			mvaddch(pos_y, pos_x, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
+			mvaddch(pos_y+screen->size_y / 2, pos_x+screen->size_x / 2, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
 			//mvprintw(pos_y, pos_x, "\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p.r, p.g, p.b, p.c);
 			attroff(COLOR_PAIR(cid));
 		}
