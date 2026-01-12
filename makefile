@@ -7,10 +7,10 @@ SRC = src
 CFLAGS = -lncurses -I$(INCLUDE) -DNDEBUG -lm
 
 
-_OBJS = main.o ascii_image.o consts.o engine_clock.o player.o vector2.o linked_list.o event_signals.o
+_OBJS = main.o ascii_image.o engine_clock.o player.o vector2.o hashmap.o screen.o linked_list.o event_signals.o
 OBJS = $(patsubst %, $(BUILD)/%, $(_OBJS))
 
-_HEADERS = ascii_image.h consts.h engine_clock.h player.h types.h vector2.h linked_list.h event_signals.h
+_HEADERS = ascii_image.h engine_clock.h player.h types.h vector2.h hashmap.h screen.h linked_list.h event_signals.h
 HEADERS = $(patsubst %, $(INCLUDE)/%, $(_HEADERS))
 
 
@@ -25,6 +25,9 @@ compile: ./$(BUILD)/$(_BUILDNAME_)
 
 $(BUILD)/%.o: $(SRC)/%.c $(HEADERS)
 	@gcc -c -o $@ $< $(CFLAGS)
+
+$(BUILD)/%.o: $(INCLUDE)/%.c $(HEADERS)
+	gcc -c -o $@ $< $(CFLAGS)
 
 sus:
 	echo $(OBJS)
