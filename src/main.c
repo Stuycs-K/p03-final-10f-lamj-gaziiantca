@@ -260,9 +260,10 @@ void testScreen(char* path1, char* path2){
 		double dt = EngineClock_waitForNextFrame();
 		char input = get_wasd_input(); 
 		Player_handleInput(newPlayer, input);
-		Player_updateMovement(newPlayer, dt);
+		Player_updateMovement(newPlayer, dt*10);
 		screen->camera->pos_x = round(newPlayer->pos.x);
 		screen->camera->pos_y = round(newPlayer->pos.y);
+		screen->camera->theta += 0.01f;
 		draw(screen);
 		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
     if (context->var) {
@@ -270,12 +271,13 @@ void testScreen(char* path1, char* path2){
     }
 		refresh();
 	}
+	endwin();
 }
 
 int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/big.texture");
 	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/sus.txt");
+	testScreen("assets/TheSkeld.txt", "assets/sus.txt");
   // testBudgetGameLoop();
 }

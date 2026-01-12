@@ -53,43 +53,52 @@ int get_color(hdPixel p){
 }
 
 void drawSprite(const hdScreen* screen, const hdSprite* sprite){
-	i32 x = sprite->pos_x - screen->camera->pos_x;
-	i32 y = sprite->pos_y - screen->camera->pos_y; //doing the rcs thingamabob for easy rotation formula
+	i32 x = sprite->pos_x + screen->camera->pos_x;
+	i32 y = sprite->pos_y + screen->camera->pos_y;
+	//should probably do smth like this:
 	/* -1,-1 === 1,-1
 	 * |    0,0   |
 	 * -1,1 ===  1,1
 	 this thing^ */
 	double theta = screen->camera->theta; 
-	i32 l_x = screen->camera->pos_x - (screen->size_x / 2);
-	i32 r_x = screen->camera->pos_x + (screen->size_x / 2);
-	i32 t_y = screen->camera->pos_y - (screen->size_y / 2);
-	i32 b_y = screen->camera->pos_y + (screen->size_y / 2); 
-	//ncurses should handle this stuff automatically but still doing it just in case
+	//camera is on the top right
+	i32 l_x = screen->camera->pos_x;
+	i32 r_x = screen->camera->pos_x + (screen->size_x);
+	i32 t_y = screen->camera->pos_y;
+	i32 b_y = screen->camera->pos_y + (screen->size_y); 
+	
+	i32 c_x = screen->camera->pos_x + screen->size_x / 4;
+	i32 c_y = screen->camera->pos_y + screen->size_y / 4;
+
+	//ncurses should handle this stuff automatically but still doing it so that we don't draw things off-screen
 	int pos_x, pos_y;
 	hdPixel p;
 	int i = 0; int sj = 0;
 	int mi = sprite->image->size_y; 
 	int mj = sprite->image->size_x; 
-	if(l_x > x) sj = l_x-x;
-	if(r_x <= x+mj) mj = r_x-x; //mj = mj-(x-r_x+mj);	
+	/*if(l_x > x) sj = x;
+	if(r_x <= x+mj) mj = r_x+x; //mj = mj-(x-r_x+mj);	
 	if(t_y > y) i = t_y-y;
-	if(b_y < y+mi) mi = b_y-y;
+	if(b_y < y+mi) mi = b_y-y; commenting this out is a very temporary fix, and by temporary...welll..let's just stay it's staying that way*/ 
 	
 	if(mj < sj || mj < 0 || mi < i || i < 0) return;
 
-	//mvprintw(20, 0, "(%d %d - %d %d) [%d %d %d %d] [%d-%d %d-%d]", x, y, x + sprite->image->size_x, y + sprite->image->size_y, l_x, r_x, t_y, b_y, i, mi, sj, mj);
+	mvprintw(20, 0, "(%d %d - %d %d) [%d %d %d %d] [%d-%d %d-%d] over [%d %d]", x, y, x + sprite->image->size_x, y + sprite->image->size_y, l_x, r_x, t_y, b_y, i, mi, sj, mj, c_x, c_y);
 	for(; i<mi; i++){
 		for(int j=sj; j<mj; j++){
+			pos_x = x+j;
+			pos_y = x+i;
 			if(theta != 0){
+				pos_x -= screen->size_x;
+				pos_y -= screen->size_y;
 				pos_x = pos_x * cos(theta) - pos_y * sin(theta);
-				pos_y = pos_y * sin(theta) + pos_y * cos(theta);
-				
-			}else{
-				pos_x = x + j; 
-				pos_y = y + i;
+				pos_y = pos_x * sin(theta) + pos_y * cos(theta);
+				pos_x += screen->size_x;
+				pos_y += screen->size_y;
+
 			}
 			/*if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
-				continue;
+				continue; 
 			}*/
 			p = sprite->image->arr[i * sprite->image->size_x + j];
 			if(p.c == ' ') continue;
