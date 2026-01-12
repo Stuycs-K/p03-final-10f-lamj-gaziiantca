@@ -227,7 +227,7 @@ void testScreen(char* path1, char* path2){
 		double dt = waitForNextFrame();
 		char input = get_wasd_input(); 
 		Player_handleInput(newPlayer, input);
-		Player_updateMovement(newPlayer, dt*25);
+		Player_updateMovement(newPlayer, dt*75);
 		screen->camera->pos_x = round(newPlayer->pos.x);
 		screen->camera->pos_y = round(newPlayer->pos.y);
 		draw(screen);
@@ -240,6 +240,6 @@ int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/big.texture");
 	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/sus.txt");
+	testScreen("assets/smallsus.txt", "assets/big.texture");
   //testEngineClock();
 }
