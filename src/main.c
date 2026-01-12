@@ -263,7 +263,8 @@ void testScreen(char* path1, char* path2){
 		Player_updateMovement(newPlayer, dt);
 		screen->camera->pos_x = round(newPlayer->pos.x);
 		screen->camera->pos_y = round(newPlayer->pos.y);
-		screen->camera->theta -= 0.01f;
+		//screen->camera->theta = M_PI / 2;
+
 		draw(screen);
 		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
     if (context->var) {
