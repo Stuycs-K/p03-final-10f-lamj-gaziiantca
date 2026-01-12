@@ -184,6 +184,7 @@ int get_wasd_input() {
 typedef struct { 
   int var; 
   Vector2 lastPos;
+  Connection* self;
 } MovedCtx;
 
 void testEvent(void* context, void* args) { // Check if player x pos is >= 10
@@ -198,7 +199,8 @@ void testEvent(void* context, void* args) { // Check if player x pos is >= 10
   }
 
   if (pos.x >= 10) {
-    con->var = 1; 
+    con->var = 1;
+    Connection_Disconnect(con->self);
   }
 }
 
@@ -210,7 +212,7 @@ void testBudgetGameLoop() {
   Player_init(newPlayer, "Aleksandr");
 
   MovedCtx* context = calloc(1, sizeof(MovedCtx));
-  Signal_Connect(newPlayer->moved, &testEvent, context);
+  context->self = Signal_Connect(newPlayer->moved, &testEvent, context);
 
   initscr();
   cbreak();
@@ -247,7 +249,7 @@ void testScreen(char* path1, char* path2){
 	Player_init(newPlayer, "Jesse");
 
   MovedCtx* context = calloc(1, sizeof(MovedCtx));
-  Signal_Connect(newPlayer->moved, &testEvent, context);
+  context->self = Signal_Connect(newPlayer->moved, &testEvent, context);
 
 	hdScreen* screen = initScreen();
 	hdSprite* bg = initSprite(loadRawImage(path2), NULL);
