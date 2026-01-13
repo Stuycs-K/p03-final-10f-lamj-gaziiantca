@@ -81,3 +81,9 @@ made functions that make the pixels work with the hashmap library I imported
 - Screen rotation
 
 - Better screen spite handling 
+
+### 2026-01-13 
+
+- Screen finished for real for real this time 
+
+- Started working on collisions 
