@@ -2,7 +2,7 @@
 #define TYPES_H_LONGERFILENAMEJUSTINCASECAUSETYPESISKINDAGENERICANDSTUFF
 
 #include <stdint.h> 
-
+#include "vector2.h"
 typedef uint64_t u64; 
 typedef uint32_t u32; 
 typedef uint16_t u16; 
@@ -55,9 +55,25 @@ typedef struct compressedImage { //this is what images are stored with in the ga
 typedef struct sprite {
 	hdRawImage* image; //can technically re-use sprites
 	i16 pos_x;
-	i16 pos_y; 
-	void* extra; //I don't think this is useful to my purposes but since this is a library the user may want to store extra info
+	i16 pos_y;
+	void* extra; //I don't think this is useful to my purposes but since this is a library and the user may want to store extra info this could be useful
 } hdSprite;
+
+typedef struct collisionTrig {
+	Vector2 p0; 
+	Vector2 p1;
+	Vector2 p2;
+} hdColTrig; 
+
+typedef struct collisionRect {
+	Vector2 pos; 
+	Vector2 size; 
+} hdColRect;
+
+typedef union collisionObject {
+	hdColTrig* trig; 
+	hdColRect* rect; 
+} collisionObject;
 
 typedef struct camera {
 	i16 pos_x; 
@@ -67,7 +83,7 @@ typedef struct camera {
 
 typedef struct hdScreen { 
 	u16 size_x; 
-	u16 size_y; //Important note: while this struct does store size_x and size_y, it is only updated during the draw call, so if you need screen size for anything else use getmaxyx(). Treat these like private variables basically. 
+	u16 size_y; //Important note: while this struct does store size_x and size_y, it is only updated during the draw call, so if you need screen size for anything else I cannot guarantee that the sizes will be accurate and you should use getmaxyx(). Treat these like private variables basically. 
 	u32 count;
 	u32 capacity; 
 	hdSprite** items;
