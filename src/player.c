@@ -3,6 +3,8 @@
 
 #include <string.h>
 
+const double konstant = 1.0f/2.0f;
+
 void Player_init(Player* self, char* name) {
   strncpy(self->name, name, NameMaxLength);
   self->pos = Vector2_new(0, 0);
@@ -21,9 +23,10 @@ void Player_updateMovement(Player* self, double dt) {
 void Player_handleInput(Player* self, char c) {
   switch(c) {
     case '\0': self->vel = Vector2_new(0,0); break;
-    case 'w': case 'W': self->vel = Vector2_new(0,1); break;
+    case 'w': case 'W': self->vel = Vector2_new(0,konstant); break;
     case 'a': case 'A': self->vel = Vector2_new(-1,0); break;
-    case 's': case 'S': self->vel = Vector2_new(0,-1); break;
+    case 's': case 'S': self->vel = Vector2_new(0,-konstant); break;
     case 'd': case 'D': self->vel = Vector2_new(1,0); break;
+	default: self->vel = Vector2_new(0,0); break;
   }
 }

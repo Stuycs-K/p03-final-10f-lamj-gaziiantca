@@ -90,11 +90,10 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 					}*/
 					pos_x -= c_x;
 					pos_y -= c_y;
-					pos2_x = pos_x * cos(theta) - pos_y * sin(theta);
-					pos2_y = pos_x * sin(theta) + pos_y * cos(theta);
-				}else{
-					pos2_x = pos_x;
-					pos2_y = pos_y;
+					pos_x = pos_x * cos(theta) - pos_y * sin(theta);
+					pos_y = pos_x * sin(theta) + pos_y * cos(theta);
+					pos_x += c_x;
+					pos_y += c_y;
 				}
 				/*if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
 					continue;
@@ -103,8 +102,8 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 				if(p.c == ' ') continue;
 				int cid = get_color(p);
 				attron(COLOR_PAIR(cid));
-				mvaddch(pos2_y, pos2_x*2, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
-				mvaddch(pos2_y, pos2_x*2+1, p.c);
+				mvaddch(pos_y, pos_x*2, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
+				mvaddch(pos_y, pos_x*2+1, p.c);
 				//mvprintw(pos_y, pos_x, "\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p.r, p.g, p.b, p.c);
 				attroff(COLOR_PAIR(cid));
 		}
