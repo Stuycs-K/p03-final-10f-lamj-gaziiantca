@@ -58,3 +58,5 @@
 ### 2026-01-12 - Working on multiplayer. Helping debug screen.
 
 - Spent class time debugging and deeply criticizing screen.c's rotation feature (40 min)
+
+- Added test UDP client and server code (40 min)
