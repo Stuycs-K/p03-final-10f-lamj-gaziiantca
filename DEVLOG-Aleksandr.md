@@ -71,3 +71,13 @@ made functions that make the pixels work with the hashmap library I imported
 ### 2026-01-11
 
 - Very basic screen functionality 
+
+### 2026-01-12 
+
+- Screen fully functional 
+
+- Quesionably optimized (will probably stay that way, but is a point that could be improved) 
+
+- Screen rotation
+
+- Better screen spite handling 

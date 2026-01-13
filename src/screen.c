@@ -20,7 +20,7 @@
 hdScreen* initScreen(){
 	hdScreen* out = (hdScreen*) (calloc(sizeof(hdScreen), 1));
 	out->camera = (hdCamera*) (calloc(sizeof(hdCamera), 1));
-	out->items = (hdSprite*) (malloc(0)); //divine intellect code don't question it
+	out->items = (hdSprite**) (malloc(0)); //divine intellect code don't question it
 	initscr(); 
 	cbreak();
 	noecho();
@@ -115,13 +115,13 @@ void draw(hdScreen* screen){
 	erase();
 	getmaxyx(stdscr, screen->size_x, screen->size_y);
 	for(int i=0; i<screen->count; i++){
-		drawSprite(screen, &screen->items[i]);
+		drawSprite(screen, screen->items[i]);
 	}
 	refresh();
 }
 
-void addSprite(hdScreen* screen, const hdSprite* sprite){
-	pointer_da_append(screen, *sprite);
+void addSprite(hdScreen* screen, hdSprite* sprite){
+	pointer_da_append(screen, sprite); //sus
 }
 
 hdSprite* initSprite(hdRawImage* img, void* extra){
@@ -148,7 +148,7 @@ void nukeSprite(hdSprite* sprite){
 
 void nukeScreen(hdScreen* screen){
 	for(int i=0; i<screen->count; i++){
-		nukeSprite(screen->items + i);
+		nukeSprite(*(screen->items + i));
 	}
 	cleanupScreen(screen);
 }

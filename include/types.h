@@ -70,7 +70,7 @@ typedef struct hdScreen {
 	u16 size_y; //Important note: while this struct does store size_x and size_y, it is only updated during the draw call, so if you need screen size for anything else use getmaxyx(). Treat these like private variables basically. 
 	u32 count;
 	u32 capacity; 
-	hdSprite* items;
+	hdSprite** items;
 	hdCamera* camera;
 } hdScreen;
 
