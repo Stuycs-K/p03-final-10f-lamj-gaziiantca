@@ -9,6 +9,8 @@
 #include "engine_clock.h"
 #include "player.h"
 #include "ascii_image.h"
+#include "event_signals.h"
+#include "vector2.h"
 #include "screen.h"
 
 
@@ -179,12 +181,36 @@ int get_wasd_input() {
   return 0;
 }
 
-void testEngineClock() {
+typedef struct { 
+  int var; 
+  Vector2 lastPos;
+} MovedCtx;
+
+void testEvent(void* context, void* args) { // Check if player x pos is >= 10
+  MovedCtx* con = (MovedCtx*) context;
+  Vector2 pos = *((Vector2*) args);
+
+  Vector2 delta = Vector2_sub(pos, con->lastPos);
+  con->lastPos = pos;
+
+  if (Vector2_mag(delta) > 0) {
+    mvprintw(4, 0, "Position changed by (%.3lf, %.3lf)", delta.x, delta.y);
+  }
+
+  if (pos.x >= 10) {
+    con->var = 1; 
+  }
+}
+
+void testBudgetGameLoop() {
   EngineClock_init();
 
   Player playerStruct;
   Player* newPlayer = &playerStruct;
   Player_init(newPlayer, "Aleksandr");
+
+  MovedCtx* context = calloc(1, sizeof(MovedCtx));
+  Signal_Connect(newPlayer->moved, &testEvent, context);
 
   initscr();
   cbreak();
@@ -192,19 +218,22 @@ void testEngineClock() {
   nodelay(stdscr, TRUE);
   curs_set(0);
 
-  // double timeToElapse = 1 - .001f;
-  // while (timeElapsed() < timeToElapse) {
   while (1) {
-    double dt = waitForNextFrame();
+    clear();
+    double dt = EngineClock_waitForNextFrame();
     char input = get_wasd_input();
     Player_handleInput(newPlayer, input);
     Player_updateMovement(newPlayer, dt);
 
-    erase();
-    mvprintw(0, 0, "Time Elapsed: %.2lfs", timeElapsed());
+    mvprintw(0, 0, "Time Elapsed: %.2lfs", EngineClock_getTimeElapsed());
     mvprintw(1, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
     mvprintw(2, 0, "dt=%lf | TPS=%.2f\n", dt, 1/dt);
-    mvprintw(3,0, "Current input: %c", input);
+    mvprintw(3, 0, "Current input: %c", input);
+
+    if (context->var) {
+      mvprintw(5, 0, "Player x position has passed 10!!");
+    }
+
     refresh();
   }
 
@@ -214,9 +243,11 @@ void testEngineClock() {
 
 void testScreen(char* path1, char* path2){
 	EngineClock_init(); 
-	Player playerStruct;
-	Player* newPlayer = &playerStruct; 
+	Player* newPlayer = (Player*) calloc(1, sizeof(Player)); 
 	Player_init(newPlayer, "Jesse");
+
+  MovedCtx* context = calloc(1, sizeof(MovedCtx));
+  Signal_Connect(newPlayer->moved, &testEvent, context);
 
 	hdScreen* screen = initScreen();
 	hdSprite* bg = initSprite(loadRawImage(path2), NULL);
@@ -224,14 +255,17 @@ void testScreen(char* path1, char* path2){
 	addSprite(screen, bg);
 	addSprite(screen, amog);
 	while(1){
-		double dt = waitForNextFrame();
+		double dt = EngineClock_waitForNextFrame();
 		char input = get_wasd_input(); 
 		Player_handleInput(newPlayer, input);
 		Player_updateMovement(newPlayer, dt*75);
 		screen->camera->pos_x = round(newPlayer->pos.x);
 		screen->camera->pos_y = round(newPlayer->pos.y);
 		draw(screen);
-		//mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+    if (context->var) {
+      mvprintw(11, 0, "Player x position has passed 10!!");
+    }
 		refresh();
 	}
 }
@@ -240,6 +274,7 @@ int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/big.texture");
 	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/big.texture");
   //testEngineClock();
+	testScreen("assets/smallsus.txt", "assets/sus.txt");
+  // testBudgetGameLoop();
 }

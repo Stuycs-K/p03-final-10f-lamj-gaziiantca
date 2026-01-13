@@ -1,26 +1,29 @@
+#include "event_signals.h"
 #include <player.h>
 
 #include <string.h>
-#include <stdlib.h>
 
-void Player_init(Player* newPlayer, char* name) {
-  strncpy(newPlayer->name, name, NameMaxLength);
-  newPlayer->pos = Vector2_new(0, 0);
-  newPlayer->vel = Vector2_new(0, 0);
+void Player_init(Player* self, char* name) {
+  strncpy(self->name, name, NameMaxLength);
+  self->pos = Vector2_new(0, 0);
+  self->vel = Vector2_new(0, 0);
 
-  newPlayer->id = 1; // Change this later
+  self->moved = Signal_new();
+
+  self->id = 1; // Change this later
 }
 
-void Player_updateMovement(Player* p, double dt) {
-  p->pos = Vector2_add(p->pos, Vector2_scale(p->vel, dt));
+void Player_updateMovement(Player* self, double dt) {
+  self->pos = Vector2_add(self->pos, Vector2_scale(self->vel, dt * MAX_SPEED));
+  Signal_Fire(self->moved, &(self->pos));
 }
 
-void Player_handleInput(Player *p, char c) {
+void Player_handleInput(Player* self, char c) {
   switch(c) {
-    case '\0': p->vel = Vector2_new(0,0); break;
-    case 'w': case 'W': p->vel = Vector2_new(0,1); break;
-    case 'a': case 'A': p->vel = Vector2_new(-1,0); break;
-    case 's': case 'S': p->vel = Vector2_new(0,-1); break;
-    case 'd': case 'D': p->vel = Vector2_new(1,0); break;
+    case '\0': self->vel = Vector2_new(0,0); break;
+    case 'w': case 'W': self->vel = Vector2_new(0,1); break;
+    case 'a': case 'A': self->vel = Vector2_new(-1,0); break;
+    case 's': case 'S': self->vel = Vector2_new(0,-1); break;
+    case 'd': case 'D': self->vel = Vector2_new(1,0); break;
   }
 }

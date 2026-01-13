@@ -1,7 +1,6 @@
 #include "vector2.h"
 
 #include <math.h>
-#include <stdio.h>
 
 Vector2 Vector2_new(double x, double y) {
   return (Vector2) {x, y};
@@ -31,7 +30,7 @@ Vector2 Vector2_normalize(Vector2 v) {
   return (Vector2) {0, 0};
 }
 
-void Vector2_print(Vector2 v) { printf("(%.2f, %.2f)\n", v.x, v.y); }
+// void Vector2_print(Vector2 v) { printf("(%.2f, %.2f)\n", v.x, v.y); }
 
 double Vector2_dist(Vector2 v1, Vector2 v2) {
   return Vector2_mag(Vector2_sub(v1, v2));

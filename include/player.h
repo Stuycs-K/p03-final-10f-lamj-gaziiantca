@@ -1,19 +1,22 @@
-#include <vector2.h>
-
 #ifndef PLAYER_H
   #define PLAYER_H
 
-  #define NameMaxLength 63
-  #define MAX_SPEED 1
+  #include "vector2.h"
+  #include  "event_signals.h"
 
-  typedef struct {
+  #define NameMaxLength 63
+  #define MAX_SPEED 20
+
+  typedef struct Player {
     int id;
     char name[NameMaxLength + 1];
     Vector2 pos, vel;
+
+    Signal* moved;
   } Player;
 
-  void Player_init(Player* newPlayer, char* name);
-  void Player_updateMovement(Player* p, double dt);
-  void Player_handleInput(Player* p, char c);
+  void Player_init(Player* self, char* name);
+  void Player_updateMovement(Player* self, double dt);
+  void Player_handleInput(Player* self, char c);
 
 #endif

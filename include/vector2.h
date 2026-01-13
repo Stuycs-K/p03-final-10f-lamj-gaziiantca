@@ -1,7 +1,7 @@
 #ifndef VECTOR2_H
   #define VECTOR2_H
 
-  typedef struct {
+  typedef struct Vector2 {
     double x, y;
   } Vector2;
 
@@ -18,8 +18,6 @@
   double Vector2_mag(Vector2 v);
 
   Vector2 Vector2_normalize(Vector2 v);
-
-  void Vector2_print(Vector2 v);
 
   double Vector2_dist(Vector2 v1, Vector2 v2);
 
