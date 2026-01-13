@@ -31,6 +31,24 @@ int setupUDP() {
   return clientd;
 }
 
+int setupUDP_Client(char* IP, struct addrinfo** returnedResult) {
+  struct addrinfo *results, *hints;
+  hints = (struct addrinfo*) calloc(1, sizeof(struct addrinfo));
+  hints->ai_family = AF_INET;
+  hints->ai_socktype = SOCK_DGRAM;
+  err(getaddrinfo(IP, PORT, hints, &results), "getaddrinfo()");
+
+
+  int sockfd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
+  err(sockfd, "Socket Error");
+
+  free(hints);
+
+  *returnedResult = results;
+
+  return sockfd;
+}
+
 void err(int i, char*message){
   if(i < 0){
 	  printf("Error: %s - %s\n",message, strerror(errno));

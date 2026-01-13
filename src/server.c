@@ -1,6 +1,7 @@
 #include "networking.h"
 
-int main(int argc, char *argv[] ) {int server_fd = setupUDP();
+int main(int argc, char *argv[]) {
+  int server_fd = setupUDP();
   char buffer[1024];
   struct sockaddr_storage client_addr;
   socklen_t addr_len = sizeof(client_addr);

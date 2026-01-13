@@ -60,3 +60,7 @@
 - Spent class time debugging and deeply criticizing screen.c's rotation feature (40 min)
 
 - Added test UDP client and server code (40 min)
+
+### 2026-01-12 - Attempting to fix UDP for client
+
+- Attempted to fix UDP setup for client side and failing (40 min)
