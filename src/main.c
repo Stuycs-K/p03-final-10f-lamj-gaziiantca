@@ -12,6 +12,7 @@
 #include "event_signals.h"
 #include "vector2.h"
 #include "screen.h"
+#include "networking.h"
 
 
 
@@ -274,11 +275,43 @@ void testScreen(char* path1, char* path2){
 	}
 }
 
-int main(){
+void testClient(char* ip){
+	struct addrinfo *results; 
+	int sockfd = setupUDP_Client(ip, &results);
+	int bytes;
+	char* message = (char*) (malloc(100)); 
+	strcpy(message, "sus");
+	bytes = sendto(sockfd, message, strlen(message), 0, results->ai_addr, results->ai_addrlen);
+}
+
+void testServer(char* ip){
+	int server_fd = setupUDP(); 
+	char* buffer = (char*) (malloc(1024)); 
+	struct sockaddr_storage client_addr; 
+	socklen_t addr_len = sizeof(client_addr);
+	int bytes;
+	while(1){
+		bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
+		buffer[bytes] = 0;
+		printf("Received %s\n", buffer);
+		sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
+	}
+}
+
+void testMulti(char* ip){
+	
+}	
+
+int main(int argc, char* argv[]){
 	//testRawImageReadingAndWriting("assets/sus.txt");
-	//testRawImageCompression("assets/big.texture");
+	//testRawImageCompression("assets/TheSkeld.txt");
 	//testHashing();
   //testEngineClock();
-	testScreen("assets/TheSkeld.txt", "assets/sus.txt");
+	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
+	if(argc == 1){
+		testClient("127.0.0.1");
+	}else{
+		testServer("127.0.0.1");
+	}
   // testBudgetGameLoop();
 }

@@ -31,6 +31,7 @@ int setupUDP() {
 	return clientd;
 }
 
+
 int setupUDP_Client(char* IP, struct addrinfo** returnedResult) {
 	struct addrinfo *results, *hints;
 	hints = (struct addrinfo*) calloc(1, sizeof(struct addrinfo));
@@ -49,7 +50,9 @@ int setupUDP_Client(char* IP, struct addrinfo** returnedResult) {
 	return sockfd;
 }
 
-void err(int i, char*message){
+
+
+static void err(int i, char*message){
 	if(i < 0){
 		printf("Error: %s - %s\n",message, strerror(errno));
 		exit(1);
