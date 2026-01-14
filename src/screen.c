@@ -123,6 +123,31 @@ void addSprite(hdScreen* screen, hdSprite* sprite){
 	pointer_da_append(screen, sprite); //sus
 }
 
+int isPixelBlack(hdPixel pixel) {
+  return pixel.r + pixel.b + pixel.c == 0;
+}
+
+void addCollisionMap(hdScreen* screen, hdSprite* sprite) {
+	int cmapWidth = sprite->image->size_y; 
+	int cmapHeight = sprite->image->size_x;
+
+  screen->cmap_width = cmapWidth;
+  screen->cmap_height = cmapHeight;
+  
+  int* cmap = (int*) calloc(cmapWidth * cmapHeight, sizeof(int));
+  screen->collisionMap = cmap;
+
+  hdPixel* pixel;
+  for (int x = 0; x < cmapWidth; x++) {
+    for (int y = 0; y < cmapHeight; y++) {
+      pixel = sprite->image->arr + (y * cmapWidth + x);
+      if (isPixelBlack(*pixel)) {
+        cmap[y * cmapWidth + x] = 1; // Indicates this pixel is collidable
+      }
+    }
+  }
+}
+
 hdSprite* initSprite(hdRawImage* img, void* extra){
 	hdSprite* out = (hdSprite*) (malloc(sizeof(hdSprite)));
 	out->image = img; 
