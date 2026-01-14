@@ -58,3 +58,13 @@
 ### 2026-01-12 - Working on multiplayer. Helping debug screen.
 
 - Spent class time debugging and deeply criticizing screen.c's rotation feature (40 min)
+
+- Added test UDP client and server code (40 min)
+
+### 2026-01-12 - Attempting to fix UDP for client. Worked on collision maps instead
+
+- Attempted to fix UDP setup for client side and failing (40 min)
+
+- Added function to add a sprite as a collision map to screen struct (20 min)
+
+- Added Player_enableCollision to add a connection to Player.moved to return a player to the last valid position if moving into a collidable. (40 min)

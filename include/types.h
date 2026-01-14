@@ -71,8 +71,8 @@ typedef struct hdScreen {
 	u32 count;
 	u32 capacity; 
 	hdSprite** items;
-  u32 cmap_width;
-  u32 cmap_height;
+  int cmap_width;
+  int cmap_height;
 	int* collisionMap;
 	hdCamera* camera;
 } hdScreen;
