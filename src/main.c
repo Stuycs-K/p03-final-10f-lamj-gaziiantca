@@ -287,7 +287,7 @@ int main(){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/big.texture");
 	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/cookedSkeld.txt");
+	testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
 
   //testEngineClock();
 	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
