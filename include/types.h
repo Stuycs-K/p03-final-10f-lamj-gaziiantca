@@ -59,22 +59,6 @@ typedef struct sprite {
 	void* extra; //I don't think this is useful to my purposes but since this is a library and the user may want to store extra info this could be useful
 } hdSprite;
 
-struct collisionTrig {
-	Vector2 p0;  //Point 0
-	Vector2 p01; //Plane vector between point 0 and point 1
-	Vector2 p02; //Plane vector between point 0 and point 2
-};
-
-struct collisionRect {
-	Vector2 pos; 
-	Vector2 size; 
-};
-
-typedef union collisionObject {
-	struct collisionTrig* trig; 
-	struct collisionRect* rect; 
-} hdColObj;
-
 typedef struct camera {
 	i16 pos_x; 
 	i16 pos_y; 
@@ -87,7 +71,7 @@ typedef struct hdScreen {
 	u32 count;
 	u32 capacity; 
 	hdSprite** items;
-	hdColObj** collisionObjects;
+	int* collisionMap;
 	hdCamera* camera;
 } hdScreen;
 
