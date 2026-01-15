@@ -16,8 +16,8 @@
   #define NETWORKING_H
   #define PORT "24290"
   #define BUFFER_SIZE 1024
-  void err(int i, char*message);
+  static void err(int i, char*message);
 
-  int setupUDP();
+  int setupUDP_Server();
   int setupUDP_Client(char* IP, struct addrinfo** returnedResult);
 #endif

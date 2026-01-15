@@ -285,7 +285,7 @@ void testClient(char* ip){
 }
 
 void testServer(char* ip){
-	int server_fd = setupUDP(); 
+	int server_fd = setupUDP_Server(); 
 	char* buffer = (char*) (malloc(1024)); 
 	struct sockaddr_storage client_addr; 
 	socklen_t addr_len = sizeof(client_addr);

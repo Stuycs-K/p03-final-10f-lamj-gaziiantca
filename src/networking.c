@@ -2,7 +2,7 @@
 #include <sys/socket.h>
 
 // Create a socket
-int setupUDP() {
+int setupUDP_Server() {
 	//setup structs for getaddrinfo//use getaddrinfo
 	struct addrinfo *results, *hints;
 
@@ -49,6 +49,8 @@ int setupUDP_Client(char* IP, struct addrinfo** returnedResult) {
 
 	return sockfd;
 }
+
+void QueueNetworkMessage(hdNetworkQueue* queue, 
 
 
 

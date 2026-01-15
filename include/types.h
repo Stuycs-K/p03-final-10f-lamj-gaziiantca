@@ -74,5 +74,18 @@ typedef struct hdScreen {
 	hdCamera* camera;
 } hdScreen;
 
+typedef struct NetworkPacket {
+	u16 id; 
+	double time_sent; 
+	u32 data_len; 
+	void* data;
+} hdPacket;
+
+typedef struct NetworkQueue {
+	hdPacket items[256]; 
+	//each item has an id indicating where is in the queue. if there is more than 256 items in the queue, the user has bigger problems.
+	int sockfd; 
+
+} hdNetworkQueue;
 
 #endif
