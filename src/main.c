@@ -336,7 +336,7 @@ int main(int argc, char* argv[]){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/TheSkeld.txt");
 	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
+	//testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
 
   //testEngineClock();
 	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
