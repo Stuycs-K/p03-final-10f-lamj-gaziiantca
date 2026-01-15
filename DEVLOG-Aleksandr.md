@@ -71,3 +71,7 @@ made functions that make the pixels work with the hashmap library I imported
 ### 2026-01-11
 
 - Very basic screen functionality 
+
+### 2026-01-14 
+
+- Network queue 
