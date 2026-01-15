@@ -21,13 +21,16 @@
   static void err(int i, char*message);
 
   int setupUDP_Server();
-  int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetworkQueue* optionalNetworkQueue);
+  int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetwork* optionalNetworkQueue);
 	//I love tab indents
-	hdNetworkQueue* initializeNetworkQueue();
+	hdNetwork* initializeNetworkQueue();
 	int sendMessage(int sockfd, void* data, u64 data_size, struct sockaddr* servaddr, u64 addr_len); //most useless abstraction of the decade award
 	
-	void QueueReliableNetworkMessage(hdNetworkQueue* queue, hdPacket* packet);
-	void receiveReliableAck(hdNetworkQueue* queue, u16 pos);
-	int loopNetworkQueue(hdNetworkQueue* queue);
-	hdPacket* createReliablePacket(void* data, u64 data_size);
+	void QueueReliableNetworkMessage(hdNetwork* queue, hdPacket* packet);
+	void handleAck(hdNetwork* queue, i16 pos);
+	int loopNetworkQueue(hdNetwork* queue);
+	hdPacket* createPacket(void* data, u64 data_size);
+	void Server_receiveData(hdNetwork* network, hdPacket* buffer);
+	void Client_receiveData(hdNetwork* network, hdPacket* buffer);
+
 #endif

@@ -76,7 +76,7 @@ typedef struct hdScreen {
 } hdScreen;
 
 typedef struct NetworkPacket {
-	u16 pos; 
+	i16 pos; //it can be -1 if getting an ack doesn't matter
 	u64 time_sent; 
 	u32 data_size; 
 	void* data;
@@ -90,6 +90,7 @@ typedef struct NetworkQueue { //man I have no idea what I'm doing
 	int sockfd; 
 	struct sockaddr* servaddr;
 	u64 addr_len;
-} hdNetworkQueue;
+} hdNetwork;
+
 
 #endif

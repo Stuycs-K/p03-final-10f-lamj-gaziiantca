@@ -279,15 +279,24 @@ void testClient(char* ip){
 	//printf("vro\n");
 	struct addrinfo *results; 
 
-	hdNetworkQueue* queue = initializeNetworkQueue();
+	hdNetwork* queue = initializeNetworkQueue();
 	int sockfd = setupUDP_Client(ip, &results, queue);
 
 	char* message = (char*) (malloc(100)); 
 	strcpy(message, "sus");
-	hdPacket* skibidi = createReliablePacket(message, strlen(message));
-	QueueReliableNetworkMessage(queue, skibidi);
+	hdPacket* out = createPacket(message, strlen(message));
+	hdPacket* in = (hdPacket*) (malloc(sizeof(hdPacket)));
+	QueueReliableNetworkMessage(queue, out);
 	int bytes;
-	bytes = loopNetworkQueue(queue);
+	int i=0;
+	while(1){
+		sprintf(message, "%d", i++);
+		bytes = loopNetworkQueue(queue);
+		Client_receiveData(queue, in);
+		printf("Received %s\n", (char*)in->data);
+		out = createPacket(message, strlen(message));
+		QueueReliableNetworkMessage(queue, out); //this will free() the original out. it queues a copy of out. 
+	}
 	//printf("%d\n", bytes);
 	//bytes = sendto(sockfd, message, strlen(message), 0, results->ai_addr, results->ai_addrlen);
 	
@@ -299,16 +308,19 @@ void testServer(char* ip){
 	struct sockaddr_storage client_addr; 
 	socklen_t addr_len = sizeof(client_addr);
 	int bytes;
+	hdNetwork* network = initializeNetworkQueue();
+	setupUDP_Server();
 	while(1){
-		bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
-		buffer[bytes] = 0;
-		printf("Received %s\n", buffer);
+		//bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
+		//buffer[bytes] = 0;
+		//printf("Received %s\n", buffer);
+		
 		sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
 	}
 }
 
 void testMulti(char* ip){
-	hdNetworkQueue* networkqueue = initializeNetworkQueue();
+	hdNetwork* networkqueue = initializeNetworkQueue();
 }	
 
 int main(int argc, char* argv[]){

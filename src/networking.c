@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 // Create a socket
-int setupUDP_Server() {
+int setupUDP_Server(hdNetwork* network) {
 	//setup structs for getaddrinfo//use getaddrinfo
 	struct addrinfo *results, *hints;
 
@@ -38,7 +38,7 @@ int setupUDP_Server() {
 }
 
 
-int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetworkQueue* networkQueue) {
+int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetwork* networkQueue) {
 	struct addrinfo *results, *hints;
 	hints = (struct addrinfo*) calloc(1, sizeof(struct addrinfo));
 	hints->ai_family = AF_INET;
@@ -61,8 +61,8 @@ int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetworkQueue* 
 	return sockfd;
 }
 
-hdNetworkQueue* initializeNetworkQueue(){
-	hdNetworkQueue* out = (hdNetworkQueue*)(calloc(sizeof(hdNetworkQueue), 1));
+hdNetwork* initializeNetworkQueue(){
+	hdNetwork* out = (hdNetwork*)(calloc(sizeof(hdNetwork), 1));
 	//printf("%p %lu\n", out->items, sizeof(*out));
 	return out;
 }
@@ -78,7 +78,7 @@ int sendMessage(int sockfd, void* data, u64 data_size, struct sockaddr* servaddr
 }
 
 //Add a packet to the queue. Note: this WILL make a copy of the packet and it WILL free the original packet's pointer and you WILL NOT be able to reliably edit it. 
-void QueueReliableNetworkMessage(hdNetworkQueue* queue, hdPacket* packet){
+void QueueReliableNetworkMessage(hdNetwork* queue, hdPacket* packet){
 	u16 index = (queue->count++); 
 	packet->pos = index;
 	packet->isreal = 1;
@@ -86,15 +86,17 @@ void QueueReliableNetworkMessage(hdNetworkQueue* queue, hdPacket* packet){
 	free(packet); //beamed by simple origin 
 }
 
-void receiveReliableAck(hdNetworkQueue* queue, u16 pos){
-	queue->items[pos%256].isreal = false; //this will absolutely cause random errors that are not the user's fault :trollface:
+void handleAck(hdNetwork* queue, i16 pos){
+	if(pos != -1){
+		queue->items[pos%256].isreal = false; //this will absolutely cause random errors that are not the user's fault :trollface:
+	}
 }
 
-int loopNetworkQueue(hdNetworkQueue* queue){
+int loopNetworkQueue(hdNetwork* queue){
 	u64 time = getTime(); //surely doing it like this won't cause anything stupid
 	int bytes = 0;
 	for(int i=0; i<256; i++){
-		if(queue->items[i].isreal && time-queue->items[i].time_sent > 200){
+		if(queue->items[i].isreal && time-queue->items[i].time_sent > 10000){
 			//printf("a\n");
 			bytes += sendMessage(queue->sockfd, queue->items[i].data, queue->items[i].data_size, queue->servaddr, queue->addr_len);
 			queue->items[i].time_sent = time;
@@ -103,11 +105,33 @@ int loopNetworkQueue(hdNetworkQueue* queue){
 	return bytes;
 }
 
-hdPacket* createReliablePacket(void* data, u64 data_size){
+hdPacket* createPacket(void* data, u64 data_size){ //will notably not be reliable unless put into the network queue
 	hdPacket* out = (hdPacket*) (calloc(sizeof(hdPacket), 1));
 	out->data = data;
 	out->data_size = data_size;
+	out->pos = -1;
 	return out;
+}
+
+void Server_receiveData(hdNetwork* network, hdPacket* buffer){ //will write a packet to the buffer. EVERYTHING sent by the client MUST be in a packet. The packets are NOT optional. This is the reason
+	int bytes; 
+	socklen_t bruh = network->addr_len; //this reeks
+	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, &bruh);
+	if(bytes > 0){
+		//lowkey wasteful but I don't have the time to care anymore
+		printf("sending ack with pos=%d\n", buffer->pos);
+		sendto(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, network->addr_len); 
+	}
+}
+
+void Client_receiveData(hdNetwork* network, hdPacket* buffer){
+	int bytes; 
+	socklen_t IloveC = network->addr_len;
+	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, &IloveC);
+	if(bytes > 0){
+		printf("%d\n", buffer->pos);
+		handleAck(network, buffer->pos);
+	}
 }
 
 static void err(int i, char*message){
