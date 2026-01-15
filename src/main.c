@@ -253,31 +253,39 @@ void testScreen(char* path1, char* path2){
 
 	hdScreen* screen = initScreen();
 	hdSprite* bg = initSprite(loadRawImage(path2), NULL);
+	hdSprite* cmap = initSprite(loadRawImage("assets/TheSkeldMask.txt"), NULL);
 	hdSprite* amog = initSprite(loadRawImage(path1), NULL);
+
+  addCollisionMap(screen, cmap);
+  Player_enableCollision(newPlayer, screen);
+
 	addSprite(screen, bg);
+  addSprite(screen, cmap);
 	addSprite(screen, amog);
 	int screen_x, screen_y;
 	int input;
 	while(1){
 		double dt = EngineClock_waitForNextFrame();
 		input = getch(); 
+		getmaxyx(stdscr, screen_y, screen_x);
 		if(input == '['){
 			screen->camera->theta += M_PI / 16;
 		}
 		Player_handleInput(newPlayer, input);
 		input = 0;
-		Player_updateMovement(newPlayer, dt*20);
-		screen->camera->pos_x = round(newPlayer->pos.x);
-		screen->camera->pos_y = round(newPlayer->pos.y);
+		Player_updateMovement(newPlayer, dt * 20);
 		//screen->camera->theta = M_PI / 2;
-		getmaxyx(stdscr, screen_y, screen_x);
-		//printf("(%d %d)\n", screen_x, screen_y);
-		amog->pos_x = newPlayer->pos.x + (double)screen_x / 4 - (double)amog->image->size_x / 2;
-		amog->pos_y = -newPlayer->pos.y + (double)screen_y / 2 - (double)amog->image->size_y / 4;
+		screen->camera->pos_x = newPlayer->pos.x - (double)screen_x / 2;
+		screen->camera->pos_y = newPlayer->pos.y - (double)screen_y / 2;
+		mvprintw(12, 0, "(%d %d)\n", screen_x, screen_y);
+    amog->pos_x = screen->camera->pos_x - (double)screen_x / 2;
+		amog->pos_y = screen->camera->pos_y + (double)screen_y / 2;
+		// amog->pos_x = newPlayer->pos.x - (double)amog->image->size_x / 2;
+		// amog->pos_y = -newPlayer->pos.y - (double)amog->image->size_y / 4;
 		draw(screen);
 		mvprintw(10, 0, "Pos: %d (%.2lf, %.2lf)", input, newPlayer->pos.x, newPlayer->pos.y);
     if (context->var) {
-      mvprintw(11, 0, "Player x position has passed 10!!");
+      // mvprintw(11, 0, "Player x position has passed 10!!");
     }
 		refresh();
 	}

@@ -61,10 +61,16 @@
 
 - Added test UDP client and server code (40 min)
 
-### 2026-01-12 - Attempting to fix UDP for client. Worked on collision maps instead
+### 2026-01-13 - Attempting to fix UDP for client. Worked on collision maps instead
 
 - Attempted to fix UDP setup for client side and failing (40 min)
 
 - Added function to add a sprite as a collision map to screen struct (20 min)
 
 - Added Player_enableCollision to add a connection to Player.moved to return a player to the last valid position if moving into a collidable. (40 min)
+
+### 2026-01-14 - Added photo-editing software to create a collision map. Trying to debug collision and screen code
+
+- Used GIMP on school computers to create collision map "mask" for map
+
+- Trying to debug collision and camera

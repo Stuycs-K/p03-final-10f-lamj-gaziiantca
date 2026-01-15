@@ -1,5 +1,6 @@
 #include "player.h"
 
+#include <ncurses.h>
 #include <stdlib.h>
 
 #include <string.h>
@@ -9,7 +10,7 @@ const double konstant = 1.0f/2.0f;
 
 void Player_init(Player* self, char* name) {
   strncpy(self->name, name, NameMaxLength);
-  self->pos = Vector2_new(180, -60);
+  self->pos = Vector2_new(0, 0);
   self->vel = Vector2_new(0, 0);
 
   self->moved = Signal_new();
@@ -39,6 +40,7 @@ typedef struct {
 void returnToLastValidPos(void* context, void* args) {
   CollisionCtx* con = (CollisionCtx*) context;
   PlayerMovedEvent* event = (PlayerMovedEvent*) args;
+    mvprintw(13, 0, "AAAAAAAAAAAAAAAAAAAAAAAAA");
   
   int xPos = event->newPos.x;
   int yPos = event->newPos.y;
@@ -48,12 +50,11 @@ void returnToLastValidPos(void* context, void* args) {
   int cmapHeight = con->cmapHeight;
 
   int playerLocationIndex = yPos * cmapHeight + xPos;
-  // Fix this later to account for cmap positioning
   if (playerLocationIndex < 0 || cmapWidth * cmapHeight <= playerLocationIndex) {
     return;
   }
 
-  if (1 == cmap[playerLocationIndex]) { 
+  if (1 == cmap[playerLocationIndex]) {
     // 1 indicates player is on a collidable
     con->player->pos = event->lastPos;
   } else {
@@ -73,9 +74,9 @@ void Player_enableCollision(Player* self, hdScreen* screen) {
 void Player_handleInput(Player* self, char c) {
   switch(c) {
     case '\0': self->vel = Vector2_new(0,0); break;
-    case 'w': case 'W': self->vel = Vector2_new(0,konstant); break;
+    case 'w': case 'W': self->vel = Vector2_new(0,1); break;
     case 'a': case 'A': self->vel = Vector2_new(-1,0); break;
-    case 's': case 'S': self->vel = Vector2_new(0,-konstant); break;
+    case 's': case 'S': self->vel = Vector2_new(0,-1); break;
     case 'd': case 'D': self->vel = Vector2_new(1,0); break;
 	default: self->vel = Vector2_new(0,0); break;
   }
