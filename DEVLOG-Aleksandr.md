@@ -72,6 +72,24 @@ made functions that make the pixels work with the hashmap library I imported
 
 - Very basic screen functionality 
 
+<<<<<<< HEAD
 ### 2026-01-14 
 
 - Network queue 
+=======
+### 2026-01-12 
+
+- Screen fully functional 
+
+- Quesionably optimized (will probably stay that way, but is a point that could be improved) 
+
+- Screen rotation
+
+- Better screen spite handling 
+
+### 2026-01-13 
+
+- Screen finished for real for real this time 
+
+- Started working on collisions 
+>>>>>>> e700c1989620f929a91946260aac67a0d20dadcf

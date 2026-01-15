@@ -257,17 +257,26 @@ void testScreen(char* path1, char* path2){
 	hdSprite* amog = initSprite(loadRawImage(path1), NULL);
 	addSprite(screen, bg);
 	addSprite(screen, amog);
+	int screen_x, screen_y;
+	int input;
 	while(1){
 		double dt = EngineClock_waitForNextFrame();
-		char input = get_wasd_input(); 
+		input = getch(); 
+		if(input == '['){
+			screen->camera->theta += M_PI / 16;
+		}
 		Player_handleInput(newPlayer, input);
-		Player_updateMovement(newPlayer, dt*75);
+		input = 0;
+		Player_updateMovement(newPlayer, dt*20);
 		screen->camera->pos_x = round(newPlayer->pos.x);
 		screen->camera->pos_y = round(newPlayer->pos.y);
 		//screen->camera->theta = M_PI / 2;
-
+		getmaxyx(stdscr, screen_y, screen_x);
+		//printf("(%d %d)\n", screen_x, screen_y);
+		amog->pos_x = newPlayer->pos.x + (double)screen_x / 4 - (double)amog->image->size_x / 2;
+		amog->pos_y = -newPlayer->pos.y + (double)screen_y / 2 - (double)amog->image->size_y / 4;
 		draw(screen);
-		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+		mvprintw(10, 0, "Pos: %d (%.2lf, %.2lf)", input, newPlayer->pos.x, newPlayer->pos.y);
     if (context->var) {
       mvprintw(11, 0, "Player x position has passed 10!!");
     }
@@ -327,6 +336,8 @@ int main(int argc, char* argv[]){
 	//testRawImageReadingAndWriting("assets/sus.txt");
 	//testRawImageCompression("assets/TheSkeld.txt");
 	//testHashing();
+	testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
+
   //testEngineClock();
 	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
 	if(argc == 1){

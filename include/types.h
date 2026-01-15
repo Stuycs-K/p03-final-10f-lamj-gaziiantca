@@ -4,6 +4,8 @@
 #include <stdint.h> 
 #include <stdbool.h>
 
+#include "vector2.h"
+
 typedef uint64_t u64; 
 typedef uint32_t u32; 
 typedef uint16_t u16; 
@@ -56,22 +58,25 @@ typedef struct compressedImage { //this is what images are stored with in the ga
 typedef struct sprite {
 	hdRawImage* image; //can technically re-use sprites
 	i16 pos_x;
-	i16 pos_y; 
-	void* extra; //I don't think this is useful to my purposes but since this is a library the user may want to store extra info
+	i16 pos_y;
+	void* extra; //I don't think this is useful to my purposes but since this is a library and the user may want to store extra info this could be useful
 } hdSprite;
 
 typedef struct camera {
 	i16 pos_x; 
 	i16 pos_y; 
-	double theta; //just for fun)
+	double theta; //just for fun) (do NOT use this in a practical setting it will NOT work)
 } hdCamera;
 
 typedef struct hdScreen { 
 	u16 size_x; 
-	u16 size_y; //Important note: while this struct does store size_x and size_y, it is only updated during the draw call, so if you need screen size for anything else use getmaxyx(). Treat these like private variables basically. 
+	u16 size_y; //Important note: while this struct does store size_x and size_y, it is only updated during the draw call, so if you need screen size for anything else I cannot guarantee that the sizes will be accurate and you should use getmaxyx(). Treat these like private variables basically. 
 	u32 count;
 	u32 capacity; 
-	hdSprite* items;
+	hdSprite** items;
+  int cmap_width;
+  int cmap_height;
+	int* collisionMap;
 	hdCamera* camera;
 } hdScreen;
 
