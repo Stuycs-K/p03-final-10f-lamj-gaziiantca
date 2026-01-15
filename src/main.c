@@ -276,12 +276,21 @@ void testScreen(char* path1, char* path2){
 }
 
 void testClient(char* ip){
+	//printf("vro\n");
 	struct addrinfo *results; 
-	int sockfd = setupUDP_Client(ip, &results);
-	int bytes;
+
+	hdNetworkQueue* queue = initializeNetworkQueue();
+	int sockfd = setupUDP_Client(ip, &results, queue);
+
 	char* message = (char*) (malloc(100)); 
 	strcpy(message, "sus");
-	bytes = sendto(sockfd, message, strlen(message), 0, results->ai_addr, results->ai_addrlen);
+	hdPacket* skibidi = createReliablePacket(message, strlen(message));
+	QueueReliableNetworkMessage(queue, skibidi);
+	int bytes;
+	bytes = loopNetworkQueue(queue);
+	//printf("%d\n", bytes);
+	//bytes = sendto(sockfd, message, strlen(message), 0, results->ai_addr, results->ai_addrlen);
+	
 }
 
 void testServer(char* ip){
@@ -299,7 +308,7 @@ void testServer(char* ip){
 }
 
 void testMulti(char* ip){
-	
+	hdNetworkQueue* networkqueue = initializeNetworkQueue();
 }	
 
 int main(int argc, char* argv[]){
@@ -313,5 +322,6 @@ int main(int argc, char* argv[]){
 	}else{
 		testServer("127.0.0.1");
 	}
+	//testMulti("127.0.0.1");
   // testBudgetGameLoop();
 }

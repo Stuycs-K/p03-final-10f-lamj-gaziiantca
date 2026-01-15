@@ -2,6 +2,7 @@
 #define TYPES_H_LONGERFILENAMEJUSTINCASECAUSETYPESISKINDAGENERICANDSTUFF
 
 #include <stdint.h> 
+#include <stdbool.h>
 
 typedef uint64_t u64; 
 typedef uint32_t u32; 
@@ -75,17 +76,20 @@ typedef struct hdScreen {
 } hdScreen;
 
 typedef struct NetworkPacket {
-	u16 id; 
-	double time_sent; 
-	u32 data_len; 
+	u16 pos; 
+	u64 time_sent; 
+	u32 data_size; 
 	void* data;
+	bool isreal; 
 } hdPacket;
 
-typedef struct NetworkQueue {
+typedef struct NetworkQueue { //man I have no idea what I'm doing
+	u16 count;
 	hdPacket items[256]; 
 	//each item has an id indicating where is in the queue. if there is more than 256 items in the queue, the user has bigger problems.
 	int sockfd; 
-
+	struct sockaddr* servaddr;
+	u64 addr_len;
 } hdNetworkQueue;
 
 #endif
