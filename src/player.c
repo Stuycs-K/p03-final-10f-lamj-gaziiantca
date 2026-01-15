@@ -9,7 +9,7 @@ const double konstant = 1.0f/2.0f;
 
 void Player_init(Player* self, char* name) {
   strncpy(self->name, name, NameMaxLength);
-  self->pos = Vector2_new(0, 0);
+  self->pos = Vector2_new(180, -60);
   self->vel = Vector2_new(0, 0);
 
   self->moved = Signal_new();
