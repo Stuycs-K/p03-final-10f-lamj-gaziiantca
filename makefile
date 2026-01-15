@@ -21,10 +21,10 @@ compile: ./$(BUILD)/$(_BUILDNAME_)
 	@echo Finished building: $(_BUILDNAME_)
 
 ./$(BUILD)/$(_BUILDNAME_): $(OBJS)
-	@gcc -o ./$(BUILD)/$(_BUILDNAME_) $(OBJS) $(HEADERS) $(CFLAGS)
+	gcc -o ./$(BUILD)/$(_BUILDNAME_) $(OBJS) $(HEADERS) $(CFLAGS)
 
 $(BUILD)/%.o: $(SRC)/%.c $(HEADERS)
-	@gcc -c -o $@ $< $(CFLAGS)
+	gcc -c -o $@ $< $(CFLAGS)
 
 $(BUILD)/%.o: $(INCLUDE)/%.c $(HEADERS)
 	gcc -c -o $@ $< $(CFLAGS)

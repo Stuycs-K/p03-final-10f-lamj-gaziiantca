@@ -28,11 +28,15 @@ int setupUDP_Server(hdNetwork* network) {
 	//bind the socket to address and port
 	err(bind(clientd, results->ai_addr, results->ai_addrlen), "Bind()");
 
-	
+	if(network != NULL){
+		network->servaddr = results->ai_addr;
+		network->addr_len = results->ai_addrlen;
+		network->sockfd = clientd;
+	}
 
 	//free the structs used by getaddrinfo
 	free(hints);
-	freeaddrinfo(results);
+	//freeaddrinfo(results);
 
 	return clientd;
 }
@@ -80,6 +84,9 @@ int sendMessage(int sockfd, void* data, u64 data_size, struct sockaddr* servaddr
 //Add a packet to the queue. Note: this WILL make a copy of the packet and it WILL free the original packet's pointer and you WILL NOT be able to reliably edit it. 
 void QueueReliableNetworkMessage(hdNetwork* queue, hdPacket* packet){
 	u16 index = (queue->count++); 
+	if(queue->count > 30000){
+		queue->count %= 30000;
+	}
 	packet->pos = index;
 	packet->isreal = 1;
 	queue->items[index%256] = *packet;
@@ -98,7 +105,7 @@ int loopNetworkQueue(hdNetwork* queue){
 	for(int i=0; i<256; i++){
 		if(queue->items[i].isreal && time-queue->items[i].time_sent > 10000){
 			//printf("a\n");
-			bytes += sendMessage(queue->sockfd, queue->items[i].data, queue->items[i].data_size, queue->servaddr, queue->addr_len);
+			bytes += sendMessage(queue->sockfd, queue->items+i, sizeof(queue->items[i]), queue->servaddr, queue->addr_len);
 			queue->items[i].time_sent = time;
 		}
 	}
@@ -119,7 +126,7 @@ void Server_receiveData(hdNetwork* network, hdPacket* buffer){ //will write a pa
 	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, &bruh);
 	if(bytes > 0){
 		//lowkey wasteful but I don't have the time to care anymore
-		printf("sending ack with pos=%d\n", buffer->pos);
+		//printf("sending ack with pos=%d dat=%s\n", buffer->pos, (char*)buffer->data);
 		sendto(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, network->addr_len); 
 	}
 }
@@ -129,7 +136,7 @@ void Client_receiveData(hdNetwork* network, hdPacket* buffer){
 	socklen_t IloveC = network->addr_len;
 	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, &IloveC);
 	if(bytes > 0){
-		printf("%d\n", buffer->pos);
+		//printf("%d\n", buffer->pos);
 		handleAck(network, buffer->pos);
 	}
 }

@@ -72,11 +72,6 @@ made functions that make the pixels work with the hashmap library I imported
 
 - Very basic screen functionality 
 
-<<<<<<< HEAD
-### 2026-01-14 
-
-- Network queue 
-=======
 ### 2026-01-12 
 
 - Screen fully functional 
@@ -92,4 +87,13 @@ made functions that make the pixels work with the hashmap library I imported
 - Screen finished for real for real this time 
 
 - Started working on collisions 
->>>>>>> e700c1989620f929a91946260aac67a0d20dadcf
+
+### 2026-01-14 
+
+- Stopped working on collisions and started working on networking
+
+- Began implementing a etwork queue 
+
+### 2026-01-15 
+
+- Finished networking (I hope)

@@ -302,7 +302,7 @@ void testClient(char* ip){
 		sprintf(message, "%d", i++);
 		bytes = loopNetworkQueue(queue);
 		Client_receiveData(queue, in);
-		printf("Received %s\n", (char*)in->data);
+		printf("Received back from the server: %s, pos id: %d\n", (char*)in->data, in->pos);
 		out = createPacket(message, strlen(message));
 		QueueReliableNetworkMessage(queue, out); //this will free() the original out. it queues a copy of out. 
 	}
@@ -312,19 +312,15 @@ void testClient(char* ip){
 }
 
 void testServer(char* ip){
-	int server_fd = setupUDP_Server(); 
-	char* buffer = (char*) (malloc(1024)); 
-	struct sockaddr_storage client_addr; 
-	socklen_t addr_len = sizeof(client_addr);
-	int bytes;
 	hdNetwork* network = initializeNetworkQueue();
-	setupUDP_Server();
+	int server_fd = setupUDP_Server(network); 
+	hdPacket* buffer = (hdPacket*) (malloc(1024)); 
 	while(1){
 		//bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
 		//buffer[bytes] = 0;
 		//printf("Received %s\n", buffer);
-		
-		sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
+		Server_receiveData(network, buffer);
+		//sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
 	}
 }
 

@@ -20,7 +20,7 @@
   #define BUFFER_SIZE 1024
   static void err(int i, char*message);
 
-  int setupUDP_Server();
+  int setupUDP_Server(hdNetwork* network);
   int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetwork* optionalNetworkQueue);
 	//I love tab indents
 	hdNetwork* initializeNetworkQueue();
