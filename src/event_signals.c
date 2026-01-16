@@ -10,7 +10,6 @@ Signal* Signal_new() {
   return newSignal;
 }
 
-#include <ncurses.h>
 void Signal_Fire(Signal* self, void* args) {
   LinkedList* connections = self->connections;
   Node* current = connections->front;

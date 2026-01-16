@@ -10,7 +10,7 @@ const double konstant = 1.0f/2.0f;
 
 void Player_init(Player* self, char* name) {
   strncpy(self->name, name, NameMaxLength);
-  self->pos = Vector2_new(0, 0);
+  self->pos = Vector2_new(630, -120);
   self->vel = Vector2_new(0, 0);
 
   self->moved = Signal_new();
@@ -40,23 +40,26 @@ typedef struct {
 void returnToLastValidPos(void* context, void* args) {
   CollisionCtx* con = (CollisionCtx*) context;
   PlayerMovedEvent* event = (PlayerMovedEvent*) args;
-    mvprintw(13, 0, "AAAAAAAAAAAAAAAAAAAAAAAAA");
+
+  mvprintw(14, 0, "Checking player position... (Should appear every frame)");
   
-  int xPos = event->newPos.x;
-  int yPos = event->newPos.y;
 
   int* cmap = con->collisionMap;
   int cmapWidth = con->cmapWidth;
   int cmapHeight = con->cmapHeight;
+  int xPos = event->newPos.x;
+  int yPos = -1 * event->newPos.y;
+
+  if (xPos < 0 || yPos < 0)
+    return;
+  if (xPos >= cmapWidth * 2 || yPos >= cmapHeight)
+    return;
 
   int playerLocationIndex = yPos * cmapHeight + xPos;
-  if (playerLocationIndex < 0 || cmapWidth * cmapHeight <= playerLocationIndex) {
-    return;
-  }
-
   if (1 == cmap[playerLocationIndex]) {
     // 1 indicates player is on a collidable
     con->player->pos = event->lastPos;
+    mvprintw(15, 0, "Player in invalid position");
   } else {
     // Do nothing
   }

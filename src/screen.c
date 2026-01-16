@@ -124,7 +124,7 @@ void addSprite(hdScreen* screen, hdSprite* sprite){
 }
 
 int isPixelBlack(hdPixel pixel) {
-  return pixel.r + pixel.b + pixel.c == 0;
+  return pixel.r + pixel.b + pixel.g <= 1;
 }
 
 void addCollisionMap(hdScreen* screen, hdSprite* sprite) {
