@@ -3,7 +3,8 @@
 
 #include <stdint.h> 
 #include <stdbool.h>
-
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "vector2.h"
 
 typedef uint64_t u64; 
@@ -80,21 +81,33 @@ typedef struct hdScreen {
 	hdCamera* camera;
 } hdScreen;
 
+#define MAX_PACKET_SIZE 1024
 typedef struct NetworkPacket {
 	i16 pos; //it can be -1 if getting an ack doesn't matter
 	u64 time_sent; 
 	u32 data_size; 
-	void* data;
 	bool isreal; 
+	u8 data[MAX_PACKET_SIZE];
 } hdPacket;
 
+typedef struct {
+	struct sockaddr_in sockaddr; //good naming schemes are my passion
+	socklen_t addr_len;
+	u64 last_seen; 
+	bool isreal;
+} hdClient;
+
+#define MAX_CLIENTS 32
 typedef struct NetworkQueue { //man I have no idea what I'm doing
 	u16 count;
 	hdPacket items[256]; 
-	//each item has an id indicating where is in the queue. if there is more than 256 items in the queue, the user has bigger problems.
+	//each item has an id indicating where is in the queue. if there is more than 256 items in the queue, blame the user and move on.
 	int sockfd; 
-	struct sockaddr* servaddr;
-	u64 addr_len;
+
+	struct sockaddr_storage servaddr; 
+	socklen_t addr_len;
+	hdClient clients[MAX_CLIENTS]; //lmao the clients will have their own unique empty list of clients too I love reusing structs this is the greatest code to have ever graced the planet waiter waiter more terrabytes of ram please this is what I earned with that image compression algorithm
+
 } hdNetwork;
 
 

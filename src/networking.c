@@ -8,13 +8,12 @@
 // Create a socket
 int setupUDP_Server(hdNetwork* network) {
 	//setup structs for getaddrinfo//use getaddrinfo
-	struct addrinfo *results, *hints;
-
-	hints = (struct addrinfo*) calloc(1, sizeof(struct addrinfo));
-	hints->ai_family = AF_INET;
-	hints->ai_socktype = SOCK_DGRAM; //TCP socket
-	hints->ai_flags = AI_PASSIVE; //only needed on server
-	err(getaddrinfo(NULL, PORT, hints, &results), "getaddrinfo()");
+	struct addrinfo *results;
+	struct addrinfo hints = {0};
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_DGRAM; //TCP socket
+	hints.ai_flags = AI_PASSIVE; //only needed on server
+	err(getaddrinfo(NULL, PORT, &hints, &results), "getaddrinfo()");
 
 	//create the socket
 	//store the socket descriptor here
@@ -27,39 +26,40 @@ int setupUDP_Server(hdNetwork* network) {
 
 	//bind the socket to address and port
 	err(bind(clientd, results->ai_addr, results->ai_addrlen), "Bind()");
+	fcntl(clientd, F_SETFL, O_NONBLOCK);
 
 	if(network != NULL){
-		network->servaddr = results->ai_addr;
 		network->addr_len = results->ai_addrlen;
 		network->sockfd = clientd;
+
+		memcpy(&network->servaddr, results->ai_addr, results->ai_addrlen);
 	}
 
 	//free the structs used by getaddrinfo
-	free(hints);
-	//freeaddrinfo(results);
+	freeaddrinfo(results);
 
 	return clientd;
 }
 
 
 int setupUDP_Client(char* IP, struct addrinfo** returnedResult, hdNetwork* networkQueue) {
-	struct addrinfo *results, *hints;
-	hints = (struct addrinfo*) calloc(1, sizeof(struct addrinfo));
-	hints->ai_family = AF_INET;
-	hints->ai_socktype = SOCK_DGRAM;
-	err(getaddrinfo(IP, PORT, hints, &results), "getaddrinfo()");
+	struct addrinfo *results;
+	struct addrinfo hints = {0};
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_DGRAM;
+	err(getaddrinfo(IP, PORT, &hints, &results), "getaddrinfo()");
 
 
 	int sockfd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
 	err(sockfd, "Socket Error");
-
-	free(hints);
+	//fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
 	*returnedResult = results;
 	if(networkQueue != NULL){
-		networkQueue->servaddr = results->ai_addr;
 		networkQueue->addr_len = results->ai_addrlen;
 		networkQueue->sockfd = sockfd;
+
+		memcpy(&networkQueue->servaddr, results->ai_addr, results->ai_addrlen);
 	}
 
 	return sockfd;
@@ -105,7 +105,7 @@ int loopNetworkQueue(hdNetwork* queue){
 	for(int i=0; i<256; i++){
 		if(queue->items[i].isreal && time-queue->items[i].time_sent > 10000){
 			//printf("a\n");
-			bytes += sendMessage(queue->sockfd, queue->items+i, sizeof(queue->items[i]), queue->servaddr, queue->addr_len);
+			bytes += sendMessage(queue->sockfd, queue->items+i, sizeof(queue->items[i]), (struct sockaddr*) &queue->servaddr, queue->addr_len);
 			queue->items[i].time_sent = time;
 		}
 	}
@@ -114,7 +114,7 @@ int loopNetworkQueue(hdNetwork* queue){
 
 hdPacket* createPacket(void* data, u64 data_size){ //will notably not be reliable unless put into the network queue
 	hdPacket* out = (hdPacket*) (calloc(sizeof(hdPacket), 1));
-	out->data = data;
+	memcpy(out->data, data, data_size); 
 	out->data_size = data_size;
 	out->pos = -1;
 	return out;
@@ -123,21 +123,58 @@ hdPacket* createPacket(void* data, u64 data_size){ //will notably not be reliabl
 void Server_receiveData(hdNetwork* network, hdPacket* buffer){ //will write a packet to the buffer. EVERYTHING sent by the client MUST be in a packet. The packets are NOT optional. This is the reason
 	int bytes; 
 	socklen_t bruh = network->addr_len; //this reeks
-	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, &bruh);
+	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->servaddr, &bruh);
 	if(bytes > 0){
+		Server_getClient(network, bruh);
 		//lowkey wasteful but I don't have the time to care anymore
 		//printf("sending ack with pos=%d dat=%s\n", buffer->pos, (char*)buffer->data);
-		sendto(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, network->addr_len); 
+		sendto(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->servaddr, network->addr_len); 
 	}
 }
 
 void Client_receiveData(hdNetwork* network, hdPacket* buffer){
 	int bytes; 
 	socklen_t IloveC = network->addr_len;
-	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, network->servaddr, &IloveC);
+	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->servaddr, &IloveC);
 	if(bytes > 0){
 		//printf("%d\n", buffer->pos);
 		handleAck(network, buffer->pos);
+	}
+}
+
+void Server_getClient(hdNetwork* network, socklen_t socklen) { //if this works first try im officially god
+	struct sockaddr_in* client = (struct sockaddr_in*) &network->servaddr;
+	u64 time = getTime();
+	for(int i=0; i<MAX_CLIENTS; i++){
+		//ok like this SHOULD be done with a hashmap but I also want to go to sleep tonight so this WON'T be done with a hashmap, ok?
+		hdClient* c = &network->clients[i];
+		if(c->isreal){ 
+			if(time - c->last_seen > 100000000){
+				printf("Disconnecting inactive client\n");
+				c->isreal = false;
+			} else if(c->sockaddr.sin_addr.s_addr == client->sin_addr.s_addr){ 
+				c->last_seen = time;
+				return;
+			}
+		}
+	}
+	for(int i=0; i<MAX_CLIENTS; i++){
+		hdClient* c = &network->clients[i];
+		if(!c->isreal){
+			c->sockaddr = *client; c->addr_len = socklen; c->isreal = true; c->last_seen = getTime();
+			printf("yoo new client\n");
+			return;
+		}
+	}
+}
+
+void Server_broadcastData(hdNetwork* network, hdPacket* buffer){
+	for(int i=0; i<MAX_CLIENTS; i++){
+		//printf("%d\n", network->clients[i].isreal);
+		if(network->clients[i].isreal){
+			//printf("Sent stuff\n");
+			sendto(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->clients[i].sockaddr, network->clients[i].addr_len);
+		}
 	}
 }
 

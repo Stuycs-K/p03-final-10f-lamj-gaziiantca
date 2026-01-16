@@ -294,17 +294,23 @@ void testClient(char* ip){
 	char* message = (char*) (malloc(100)); 
 	strcpy(message, "sus");
 	hdPacket* out = createPacket(message, strlen(message));
-	hdPacket* in = (hdPacket*) (malloc(sizeof(hdPacket)));
 	QueueReliableNetworkMessage(queue, out);
+	printf("Letting the server know we exist\n");
+	loopNetworkQueue(queue);
 	int bytes;
 	int i=0;
 	while(1){
-		sprintf(message, "%d", i++);
-		bytes = loopNetworkQueue(queue);
+		hdPacket* in = (hdPacket*) (calloc(sizeof(hdPacket), 1));
+		//sprintf(message, "%d", i++);
+		//bytes = loopNetworkQueue(queue);
+		printf("Waiting...\n");
 		Client_receiveData(queue, in);
 		printf("Received back from the server: %s, pos id: %d\n", (char*)in->data, in->pos);
-		out = createPacket(message, strlen(message));
-		QueueReliableNetworkMessage(queue, out); //this will free() the original out. it queues a copy of out. 
+		free(in);
+		//out = createPacket(message, strlen(message));
+		
+		//QueueReliableNetworkMessage(queue, out); //this will free() the original out. it queues a copy of out. 
+		usleep(10000);
 	}
 	//printf("%d\n", bytes);
 	//bytes = sendto(sockfd, message, strlen(message), 0, results->ai_addr, results->ai_addrlen);
@@ -314,14 +320,30 @@ void testClient(char* ip){
 void testServer(char* ip){
 	hdNetwork* network = initializeNetworkQueue();
 	int server_fd = setupUDP_Server(network); 
-	hdPacket* buffer = (hdPacket*) (malloc(1024)); 
+	char* data = (char*)(malloc(100));
+	int i = 0;
+	//sprintf(data, "%d", i);
+	sprintf(data, "%d", i++);
+	hdPacket* out = createPacket(data, strlen(data));
+	hdPacket* buffer = (hdPacket*)(calloc(sizeof(hdPacket), 1));
 	while(1){
 		//bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
 		//buffer[bytes] = 0;
 		//printf("Received %s\n", buffer);
 		Server_receiveData(network, buffer);
+		//Server_broadcastData(network, buffer);
 		//sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
+		sprintf((char*) out->data, "%d", i++);
+			
+		//printf("Sending %s\n", (char*)out->data);
+		out->data_size = strlen((char*) out->data);
+		Server_broadcastData(network, out);
+		//QueueReliableNetworkMessage(network, out);
+		//loopNetworkQueue(network);
+		//out = createPacket(data, strlen(data));
+		usleep(10000);
 	}
+
 }
 
 void testMulti(char* ip){

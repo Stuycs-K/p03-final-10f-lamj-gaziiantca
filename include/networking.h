@@ -32,5 +32,9 @@
 	hdPacket* createPacket(void* data, u64 data_size);
 	void Server_receiveData(hdNetwork* network, hdPacket* buffer);
 	void Client_receiveData(hdNetwork* network, hdPacket* buffer);
+	
+	void Server_getClient(hdNetwork* network, socklen_t socklen);
+	void Server_broadcastData(hdNetwork* network, hdPacket* buffer);
+	
 
 #endif
