@@ -1,4 +1,5 @@
 .clangd
+assets/bad_apple/*
 # Prerequisites
 *.d
 

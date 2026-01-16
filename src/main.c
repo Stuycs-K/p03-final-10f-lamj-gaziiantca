@@ -62,7 +62,7 @@ void testRawImageCompression(char* path){
 		for(int x=0; x<img2->size_x; x++){
 			hdPixel* p1 = &img2->arr[y * img->size_x + x];
 			hdPixel* p2 = &img->arr[y * img->size_x + x];
-			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
+			printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
 			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
 			if(p1->r != p2->r){
 				printf("sus (%d,%d) %d vs %d\n", x, y, p1->r, p2->r);
@@ -86,8 +86,8 @@ void testRawImageCompression(char* path){
 		for(int x=0; x<img3->size_x; x++){
 			hdPixel* p1 = &img3->arr[y * img->size_x + x];
 			hdPixel* p2 = &img->arr[y * img->size_x + x];
-			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
-			//printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
+			printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p1->r, p1->g, p1->b, p1->c); 
+			printf("\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p2->r, p2->g, p2->b, p2->c); 
 			if(p1->r != p2->r){
 				printf("sus (%d,%d) %d vs %d\n", x, y, p1->r, p2->r);
 				return;
@@ -269,9 +269,6 @@ void testServer(char* ip){
 
 }
 
-void testMulti(char* ip){
-	hdNetwork* networkqueue = initializeNetworkQueue();
-}	
 
 typedef struct {
   hdScreen* screen;
@@ -381,19 +378,18 @@ void StartLocalGame() {
 }
 
 int main(int argc, char* argv[]){
-	//testRawImageReadingAndWriting("assets/sus.txt");
-	//testRawImageCompression("assets/TheSkeld.txt");
+	// testRawImageReadingAndWriting("assets/sus.txt");
+	//testRawImageCompression("assets/ascii_apple/ascii_01047.txt");
 	//testHashing();
-	//testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
+	//testScreen("assets/smallsus.txt", "assets/ascii_apple/TheSkeld.txt");
 
   //testEngineClock();
 	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
-
-	// if(argc == 1){
-	// 	testClient("127.0.0.1");
-	// }else{
-	// 	testServer("127.0.0.1");
-	// }
+	/*if(argc == 1){
+		testClient("127.0.0.1");
+	}else{
+		testServer("127.0.0.1");
+	}*/
 	//testMulti("127.0.0.1");
 
   StartLocalGame();

@@ -100,6 +100,7 @@ fortyeight:
 #ifdef NDEBUG
 	printf("Loaded a texture of size %d X %d with %d total fragments\n", size_x, size_y, f_arr.count); 
 #endif
+	fclose(f);
 	return out;
 }
 
@@ -119,6 +120,7 @@ void writeRawImage(const hdRawImage* img, const char* path) {
 #ifdef NDEBUG
 		printf("Wrote %d bytes map, should be %lu\n", bytes, img->size_x * img->size_y * sizeof(hdPixel));
 #endif
+	close(f);
 	}
 
 hdRawImage* readRawImage(const char* path){
@@ -137,7 +139,7 @@ hdRawImage* readRawImage(const char* path){
 	out->arr = (hdPixel*) (malloc(out->size_x * out->size_y * sizeof(*out->arr)));
 	bytes = read(f, out->arr, out->size_x * out->size_y * sizeof(*out->arr));
 	if(bytes < 0) err("Reading raw image map");
-
+	close(f);
 	return out;
 }
 
