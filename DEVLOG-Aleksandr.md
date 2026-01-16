@@ -97,3 +97,5 @@ made functions that make the pixels work with the hashmap library I imported
 ### 2026-01-15 
 
 - Finished networking (I hope)
+
+- ^this guy had no clue what he was talking about 
