@@ -71,6 +71,28 @@
 
 ### 2026-01-14 - Added photo-editing software to create a collision map. Trying to debug collision and screen code
 
-- Used GIMP on school computers to create collision map "mask" for map
+- Used GIMP on school computers to create collision map "mask" for map (20 min)
 
-- Trying to debug collision and camera
+- Criticized Aleksandr's code more (20 min)
+
+- Trying to debug collision and camera (30 min)
+
+### 2026-01-15 - Finally debugged collisions.
+
+- More failure at debugging collisions (20 min)
+
+- Spent 10 minutes trying to regenerate outdated map file. And locked myself out of my home directory. (Aleksandr's fault)
+
+- Spent another 10 minutes wondering why the map generation was mysteriously broken (tmux doesn't support colors)
+
+- In a historical moment of genius, 2 days worth of bugs came from accidentally using the ASCII pixel's character value as the green color value. Finally fixed collisions (NaN hours)
+  - Fixed incorrect cmap bound checking
+  - Fixed screen tracking character wrong (only Aleksandr would make character centered at top left of screen)
+  - Fixed checking pixel colors
+  - Fixed draw() clearing premature debug messages/prints
+
+- Improved skeld map accuracies and resolution (15 min)
+
+- Reformatted main loop into a Heartbeat event in each frame. Improved readability. (40 min)
+
+

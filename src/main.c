@@ -10,6 +10,7 @@
 #include "player.h"
 #include "ascii_image.h"
 #include "event_signals.h"
+#include "types.h"
 #include "vector2.h"
 #include "screen.h"
 
@@ -260,12 +261,15 @@ void testScreen(char* path1, char* path2){
   Player_enableCollision(newPlayer, screen);
 
 	addSprite(screen, bg);
-  addSprite(screen, cmap);
+  // addSprite(screen, cmap);
 	addSprite(screen, amog);
 	int screen_x, screen_y;
 	int input;
+
 	while(1){
 		double dt = EngineClock_waitForNextFrame();
+		draw(screen);
+
 		input = getch(); 
 		getmaxyx(stdscr, screen_y, screen_x);
 		if(input == '['){
@@ -273,31 +277,124 @@ void testScreen(char* path1, char* path2){
 		}
 		Player_handleInput(newPlayer, input);
 		input = 0;
-		Player_updateMovement(newPlayer, dt * 20);
+		Player_updateMovement(newPlayer, dt * 5);
 		//screen->camera->theta = M_PI / 2;
-		screen->camera->pos_x = newPlayer->pos.x - (double)screen_x / 2;
-		screen->camera->pos_y = newPlayer->pos.y - (double)screen_y / 2;
-		mvprintw(12, 0, "(%d %d)\n", screen_x, screen_y);
-    amog->pos_x = screen->camera->pos_x - (double)screen_x / 2;
-		amog->pos_y = screen->camera->pos_y + (double)screen_y / 2;
-		// amog->pos_x = newPlayer->pos.x - (double)amog->image->size_x / 2;
-		// amog->pos_y = -newPlayer->pos.y - (double)amog->image->size_y / 4;
-		draw(screen);
-		mvprintw(10, 0, "Pos: %d (%.2lf, %.2lf)", input, newPlayer->pos.x, newPlayer->pos.y);
+		screen->camera->pos_x = newPlayer->pos.x - (double) screen_x / 4;
+		screen->camera->pos_y = newPlayer->pos.y + (double) screen_y / 2;
+    amog->pos_x = newPlayer->pos.x - (double)amog->image->size_x / 2;
+		amog->pos_y = -newPlayer->pos.y - (double)amog->image->size_y / 4;
+
+		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
+		mvprintw(11, 0, "(%d %d) %d", screen_x, screen_y);
     if (context->var) {
-      // mvprintw(11, 0, "Player x position has passed 10!!");
+      mvprintw(12, 0, "Player x position has passed 10!! (Event disconnected)");
     }
 		refresh();
 	}
 }
 
-int main(){
-	//testRawImageReadingAndWriting("assets/sus.txt");
-	//testRawImageCompression("assets/big.texture");
-	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
+typedef struct {
+  hdScreen* screen;
+  Player* player;
+  hdSprite* playerSprite;
+  int* var;
+} HeartbeatCtx;
 
-  //testEngineClock();
-	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
-  // testBudgetGameLoop();
+typedef struct {
+  double dt;
+  double elapsed;
+} HeartbeatEvent;
+
+void centerCameraOnPlayer(hdScreen* screen, Player* player) {
+  int screen_x, screen_y;
+  getmaxyx(stdscr, screen_y, screen_x);
+  screen->camera->pos_x = round(player->pos.x - (double) screen_x / 4);
+  screen->camera->pos_y = round(player->pos.y + (double) screen_y / 2);
+}
+
+void centerSpriteOnPlayer(hdSprite* sprite, Player* player) {
+  sprite->pos_x = round(player->pos.x - (double) sprite->image->size_x / 2);
+  sprite->pos_y = round(-1 * player->pos.y - (double) sprite->image->size_y / 4);
+}
+
+void onHeartBeat(void* context, void* args) {
+  HeartbeatCtx* con = (HeartbeatCtx*) context;
+  // HeartbeatEvent* event = (HeartbeatEvent*) args;
+
+  int input;
+
+  hdScreen* screen = con->screen;
+  Player* player = con->player;
+  hdSprite* playerSprite = con->playerSprite;
+  int* var = con->var;
+
+  double dt = EngineClock_waitForNextFrame();
+  double elapsed = EngineClock_getTimeElapsed();
+
+  draw(screen); // Let this draw a frame behind noobs
+
+  input = getch(); 
+  if(input == '['){
+    screen->camera->theta += M_PI / 16;
+  }
+
+  Player_handleInput(player, input);
+  Player_updateMovement(player, dt * 5);
+
+  centerCameraOnPlayer(screen, player);
+  centerSpriteOnPlayer(playerSprite, player);
+
+  mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", player->pos.x, player->pos.y);
+  if (*var) {
+    mvprintw(11, 0, "Player x position has passed 10!! (Event now disconnected)");
+  }
+  if (elapsed > 5) {
+    mvprintw(12, 0, "Over 5 seconds have passed!");
+  }
+  refresh();
+}
+
+Signal* Game_init() {
+	EngineClock_init(); 
+	Player* newPlayer = (Player*) calloc(1, sizeof(Player)); 
+	Player_init(newPlayer, "Jesse");
+
+  MovedCtx* context = calloc(1, sizeof(MovedCtx));
+  context->self = Signal_Connect(newPlayer->moved, &testEvent, context);
+
+	hdScreen* screen = initScreen();
+	hdSprite* bg = initSprite(loadRawImage("assets/TheSkeld.txt"), NULL);
+	hdSprite* cmap = initSprite(loadRawImage("assets/TheSkeldMask.txt"), NULL);
+	hdSprite* amog = initSprite(loadRawImage("assets/smallsus.txt"), NULL);
+  int var;
+
+  addCollisionMap(screen, cmap);
+  Player_enableCollision(newPlayer, screen);
+
+	addSprite(screen, bg);
+	addSprite(screen, amog);
+
+  Signal* Heartbeat = Signal_new();
+
+  HeartbeatCtx* HeartbeatContext = (HeartbeatCtx*) malloc(sizeof(HeartbeatCtx));
+  HeartbeatContext->screen = screen;
+  HeartbeatContext->player = newPlayer;
+  HeartbeatContext->playerSprite = amog;
+  HeartbeatContext->var = &var;
+
+  Signal_Connect(Heartbeat, &onHeartBeat, HeartbeatContext);
+  return Heartbeat;
+}
+
+void StartLocalGame() {
+  Signal* GameHeartbeat = Game_init();
+
+	while (1) {
+    Signal_Fire(GameHeartbeat, NULL);
+    // Connect extra signals to heartbeat
+  }
+}
+
+int main(){
+  StartLocalGame();
 }
