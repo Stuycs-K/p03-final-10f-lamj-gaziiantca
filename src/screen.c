@@ -68,7 +68,7 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 	int c_x = l_x + r_x / 2;
 	int c_y = t_y + b_y / 2;
 	double pos_x, pos_y, pos2_x, pos2_y;
-	hdPixel p;
+	hdPixel p = {0};
 	int i = 0; int sj = 0;
 	int mi = sprite->image->size_y; 
 	int mj = sprite->image->size_x; 
@@ -98,12 +98,13 @@ void drawSprite(const hdScreen* screen, const hdSprite* sprite){
 				/*if(pos_x < l_x || pos_x > r_x || pos_y < t_y || pos_y > b_y) {
 					continue;
 				}*/
+
 				p = sprite->image->arr[i * sprite->image->size_x + j];
 				if(p.c == ' ') continue;
 				int cid = get_color(p);
 				attron(COLOR_PAIR(cid));
-				mvaddch(pos_y, pos_x*2, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
-				mvaddch(pos_y, pos_x*2+1, p.c);
+				mvaddch(pos_y, pos_x, p.c); //this will lowkey print everything with an offset but that's tomorrow me's issue
+				//mvaddch(pos_y, pos_x, p.c);
 				//mvprintw(pos_y, pos_x, "\033[48;2;%hhu;%hhu;%hhum%c\033[0m", p.r, p.g, p.b, p.c);
 				attroff(COLOR_PAIR(cid));
 		}

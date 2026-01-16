@@ -168,11 +168,11 @@ void Server_getClient(hdNetwork* network, socklen_t socklen) { //if this works f
 		//ok like this SHOULD be done with a hashmap but I also want to go to sleep tonight so this WON'T be done with a hashmap, ok?
 		hdClient* c = &network->clients[i];
 		if(c->isreal){ 
-			if(time - c->last_seen > 100000000){
+			if(time - c->last_seen > 1000000){
 				printf("Disconnecting inactive client\n");
 				c->isreal = false;
 			} else if(c->sockaddr.sin_addr.s_addr == client->sin_addr.s_addr){ 
-				c->last_seen = time;
+				c->sockaddr = *client; c->addr_len = socklen; c->isreal = true; c->last_seen = getTime();
 				return;
 			}
 		}
@@ -191,7 +191,7 @@ void Server_broadcastData(hdNetwork* network, hdPacket* packet){
 	for(int i=0; i<MAX_CLIENTS; i++){
 		//printf("%d\n", network->clients[i].isreal);
 		if(network->clients[i].isreal){
-			printf("Sent stuff %*.s\n", packet->data_size, packet->data);
+			//printf("Sent stuff %*.s\n", packet->data_size, packet->data);
 			sendto(network->sockfd, packet, sizeof(hdPacket)+packet->data_size, 0, (struct sockaddr*) &network->clients[i].sockaddr, network->clients[i].addr_len);
 		}
 	}
