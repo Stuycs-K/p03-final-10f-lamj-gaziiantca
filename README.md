@@ -93,7 +93,7 @@ In Player_UpdateMovement():
 
 Example of how you can create ASCII text images that can be rendered in the terminal:
 ```
-  ascii-image-converter -C --color-bg -d${WIDTH},${HEIGHT} /path_to_your_img/image_name.extension
+  $ ascii-image-converter -C --color-bg -d${WIDTH},${HEIGHT} /path_to_your_img/image_name.extension > newImagePath.txt
 ```
 
 How you can use Screen and Sprite functions:
