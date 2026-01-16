@@ -33,7 +33,8 @@ We have a (perhapseth useful) explanation video:
       ```
       $ sudo pacman -S ncurses
       ```
-
+  - hashmap.c (https://github.com/tidwall/hashmap.c)
+    - Is a part of the repo 
 
 ### Instructions:
 
@@ -107,12 +108,121 @@ In Player_UpdateMovement():
 Example of how you can create ASCII text images that can be rendered in the terminal:
 ```
   $ ascii-image-converter -C --color-bg -d${WIDTH},${HEIGHT} /path_to_your_img/image_name.extension > newImagePath.txt
+
+  ...
+    #include "ascii_image.h"
+    hdRawImage* image = readRawImage("newImagePath.txt")
+  ...
+
+  Since this output will weigh a lot, you can optionally compress your image: 
+  ...
+    #include "ascii_image.h" 
+    hdRawImage* image = loadRawImage("newImagePath.txt");
+    hdCompressedImage* cimg = compressRawImage(image);
+    //uncompression: 
+    hdRawImage* uncompressed = uncompressImage(cimg);
+  ...
+
+  You can also write down the raw and compressed images to be read later (that's the intended usage btw)
+  ...
+    #include "ascii_image.h" 
+    hdRawImage* image = loadRawImage("newImagePath.txt"); 
+    hdCompressedImage* cimg = compressRawImage(image); 
+    
+    writeRawImage(image, "rawImage");
+    hdRawImage* readRawImage = readRawImage("rawImage");
+     
+    writeCompressedImage(cimg, "compressedImage");
+    hdCompressedImage* readCompressedImage = readCompressedImage("compressedImage");
+    hdRawImage* readUncompressedImage = uncompressImage(readCompressedImage);
+  ...
+
 ```
 
-How you can use Screen and Sprite functions:
+How you can use Screen and Player Collisions and Sprite functions:
 ```
+    
+    First, you want to create an image, see the above code to see how to do that. You specifically want an hdRawImage*
+    You also want a transparent white overlay image to indicate the collision map
+    ...
+      hdScreen* screen = initScreen(); 
+      hdSprite* sprite = initSprite(image, NULL); //NULL can be replaced with anything extra which you want that sprite to store 
+      hdSprite* cmap = initSprite(mapMask, NULL); 
+
+      addCollisionMap(screen, cmap);
+      addSprite(screen, sprite); 
+        
+      Player* plr = (Player*) calloc(1, sizeof(Player)); 
+      Player_enableCollision(plr, screen);
+
+      //in your loop (note that I'm not writing out the heartbeat context here):
+      draw(screen); 
+    ...
 
 ```
+
+Networking:
+
+```
+Disclaimer: The engine uses exclusively UDP.
+
+You want to start off by making an hdNetwork* object:
+
+  ...
+    hdNetwork* network = initializeNetworkQueue(); 
+  ...
+
+  From there, servers and clients naturally have different code
+
+  - For the server: 
+
+  ...
+    int server_fd = setupUDP_Server(network); 
+  ...
+
+  Then, to receive and send data on the server use 
+  
+  ...
+    
+    hdPacket* buffer = (hdPacket*)(calloc(sizeof(hdPacket), 1));
+    Server_receiveData(network, &buffer); //free()'s the old buffer btw
+
+    //Unreliable message:
+    hdPacket* out = createPacket(data, data_size); //you define data and data_size
+    Server_broadcastData(network, out);
+
+    //Reliable message (will keep resending): 
+    QueueReliableNetworkMessage(network, out); //free()'s the packet btw
+    loopNetworkQueue(network);
+
+  ...
+
+  - For the client:
+
+  ...
+    struct addrinfo* results; 
+    hdNetwork* network = initializeNetworkQueue(); 
+    int sockfd = setupUDP_Client(ip, &results, queue); 
+    
+    //Receiving data: 
+    hdPacket* in = (hdPacket*) (calloc(sizeof(hdPacket), 1));
+    Client_receiveData(queue, &in); //free()'s the old in btw
+
+    //Unreliable send:
+    hdPacket* out = createPacket(data, data_size); 
+    Client_sendData(network, out);
+
+
+    //Reliable send (will keep resending):
+    QueueReliableNetworkMessage(network, out); 
+    loopNetworkQueue(network); 
+
+
+    
+  ...
+
+```
+
 
 ### Resources/ References:
 - Zoraiz Hassan - [TheZoraiz](https://github.com/TheZoraiz)/[ascii-image-converter](https://github.com/TheZoraiz/ascii-image-converter)
