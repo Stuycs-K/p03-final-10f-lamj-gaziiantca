@@ -271,7 +271,7 @@ void testServer(char* ip){
 
 void testMulti(char* ip){
 	hdNetwork* networkqueue = initializeNetworkQueue();
-}
+}	
 
 typedef struct {
   hdScreen* screen;
