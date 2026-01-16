@@ -349,15 +349,12 @@ void testServer(char* ip){
 
 }
 
-void testMulti(char* ip){
-	hdNetwork* networkqueue = initializeNetworkQueue();
-}	
 
 int main(int argc, char* argv[]){
-	//testRawImageReadingAndWriting("assets/sus.txt");
-	//testRawImageCompression("assets/ascii_apple/ascii_01045.txt");
+	testRawImageReadingAndWriting("assets/sus.txt");
+	//testRawImageCompression("assets/ascii_apple/ascii_01047.txt");
 	//testHashing();
-	testScreen("assets/smallsus.txt", "assets/ascii_apple/TheSkeld.txt");
+	//testScreen("assets/smallsus.txt", "assets/ascii_apple/TheSkeld.txt");
 
   //testEngineClock();
 	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");

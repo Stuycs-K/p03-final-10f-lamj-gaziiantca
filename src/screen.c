@@ -50,6 +50,9 @@ int get_color(hdPixel p){
 	int g6 = (p.g*5) / 255; 
 	int b6 = (p.b*5) / 255;
 	return 16 + (36 * r6) + (6 * g6) + b6;
+
+	if(p.r < 32) return 16;
+	return 231;
 }
 
 void drawSprite(const hdScreen* screen, const hdSprite* sprite){
