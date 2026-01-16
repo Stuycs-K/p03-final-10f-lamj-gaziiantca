@@ -121,7 +121,7 @@ hdPacket* createPacket(void* data, u64 data_size){ //will notably not be reliabl
 	return out;
 }
 
-void Server_receiveData(hdNetwork* network, hdPacket** ptrBuffer){ //will write a packet to the buffer. EVERYTHING sent by the client MUST be in a packet. The packets are NOT optional. This is the reason
+void Server_receiveData(hdNetwork* network, hdPacket** ptrBuffer){ //will write a packet to the buffer. it will also free the old packet. EVERYTHING sent by the client MUST be in a packet. The packets are NOT optional. This is the reason
 	int bytes; 
 	hdPacket* buffer = *ptrBuffer;
 	
