@@ -13,6 +13,7 @@
 #include "types.h"
 #include "vector2.h"
 #include "screen.h"
+#include "networking.h"
 
 
 
@@ -183,114 +184,93 @@ int get_wasd_input() {
 }
 
 typedef struct { 
-  int var; 
+  int* var; 
   Vector2 lastPos;
   Connection* self;
 } MovedCtx;
 
-void testEvent(void* context, void* args) { // Check if player x pos is >= 10
+void IsPlayerPastXValOf700(void* context, void* args) { // Check if player x pos is >= 10
   MovedCtx* con = (MovedCtx*) context;
   Vector2 pos = *((Vector2*) args);
 
   Vector2 delta = Vector2_sub(pos, con->lastPos);
   con->lastPos = pos;
 
-  if (Vector2_mag(delta) > 0) {
-    mvprintw(4, 0, "Position changed by (%.3lf, %.3lf)", delta.x, delta.y);
-  }
+  mvprintw(12, 0, "^^^ Proof it's still connected. Position changed by (%.3lf, %.3lf)", delta.x, delta.y);
 
-  if (pos.x >= 10) {
-    con->var = 1;
+  if (pos.x >= 700) {
+    *con->var = 1;
     Connection_Disconnect(con->self);
   }
 }
 
-void testBudgetGameLoop() {
-  EngineClock_init();
+void testClient(char* ip){
+	//printf("vro\n");
+	struct addrinfo *results; 
 
-  Player playerStruct;
-  Player* newPlayer = &playerStruct;
-  Player_init(newPlayer, "Aleksandr");
+	hdNetwork* queue = initializeNetworkQueue();
+	int sockfd = setupUDP_Client(ip, &results, queue);
 
-  MovedCtx* context = calloc(1, sizeof(MovedCtx));
-  context->self = Signal_Connect(newPlayer->moved, &testEvent, context);
-
-  initscr();
-  cbreak();
-  noecho();
-  nodelay(stdscr, TRUE);
-  curs_set(0);
-
-  while (1) {
-    clear();
-    double dt = EngineClock_waitForNextFrame();
-    char input = get_wasd_input();
-    Player_handleInput(newPlayer, input);
-    Player_updateMovement(newPlayer, dt);
-
-    mvprintw(0, 0, "Time Elapsed: %.2lfs", EngineClock_getTimeElapsed());
-    mvprintw(1, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
-    mvprintw(2, 0, "dt=%lf | TPS=%.2f\n", dt, 1/dt);
-    mvprintw(3, 0, "Current input: %c", input);
-
-    if (context->var) {
-      mvprintw(5, 0, "Player x position has passed 10!!");
-    }
-
-    refresh();
-  }
-
-  exitGame(0);
+	char* message = (char*) (malloc(100)); 
+	strcpy(message, "sus");
+	hdPacket* out = createPacket(message, strlen(message));
+	//QueueReliableNetworkMessage(queue, out);
+	printf("Letting the server know we exist\n");
+	//loopNetworkQueue(queue);
+	Client_sendData(queue, out);
+	int bytes;
+	hdPacket* in = (hdPacket*) (calloc(sizeof(hdPacket), 1));
+	int i=0;
+	while(1){
+		//sprintf(message, "%d", i++);
+		//bytes = loopNetworkQueue(queue);
+		printf("Waiting...\n");
+		Client_receiveData(queue, &in);
+		printf("Received back from the server: %s, pos id: %d\n", (char*)in->data, in->pos);
+		//out = createPacket(message, strlen(message));
+		
+		//QueueReliableNetworkMessage(queue, out); //this will free() the original out. it queues a copy of out. 
+		usleep(10000);
+	}
+	//printf("%d\n", bytes);
+	//bytes = sendto(sockfd, message, strlen(message), 0, results->ai_addr, results->ai_addrlen);
+	
 }
 
-
-void testScreen(char* path1, char* path2){
-	EngineClock_init(); 
-	Player* newPlayer = (Player*) calloc(1, sizeof(Player)); 
-	Player_init(newPlayer, "Jesse");
-
-  MovedCtx* context = calloc(1, sizeof(MovedCtx));
-  context->self = Signal_Connect(newPlayer->moved, &testEvent, context);
-
-	hdScreen* screen = initScreen();
-	hdSprite* bg = initSprite(loadRawImage(path2), NULL);
-	hdSprite* cmap = initSprite(loadRawImage("assets/TheSkeldMask.txt"), NULL);
-	hdSprite* amog = initSprite(loadRawImage(path1), NULL);
-
-  addCollisionMap(screen, cmap);
-  Player_enableCollision(newPlayer, screen);
-
-	addSprite(screen, bg);
-  // addSprite(screen, cmap);
-	addSprite(screen, amog);
-	int screen_x, screen_y;
-	int input;
-
+void testServer(char* ip){
+	hdNetwork* network = initializeNetworkQueue();
+	int server_fd = setupUDP_Server(network); 
+	char* data = (char*)(malloc(100));
+	int i = 0;
+	//sprintf(data, "%d", i);
+	sprintf(data, "%d", i++);
+	hdPacket* out = createPacket(data, strlen(data));
+	hdPacket* buffer = (hdPacket*)(calloc(sizeof(hdPacket), 1));
 	while(1){
-		double dt = EngineClock_waitForNextFrame();
-		draw(screen);
-
-		input = getch(); 
-		getmaxyx(stdscr, screen_y, screen_x);
-		if(input == '['){
-			screen->camera->theta += M_PI / 16;
-		}
-		Player_handleInput(newPlayer, input);
-		input = 0;
-		Player_updateMovement(newPlayer, dt * 5);
-		//screen->camera->theta = M_PI / 2;
-		screen->camera->pos_x = newPlayer->pos.x - (double) screen_x / 4;
-		screen->camera->pos_y = newPlayer->pos.y + (double) screen_y / 2;
-    amog->pos_x = newPlayer->pos.x - (double)amog->image->size_x / 2;
-		amog->pos_y = -newPlayer->pos.y - (double)amog->image->size_y / 4;
-
-		mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", newPlayer->pos.x, newPlayer->pos.y);
-		mvprintw(11, 0, "(%d %d) %d", screen_x, screen_y);
-    if (context->var) {
-      mvprintw(12, 0, "Player x position has passed 10!! (Event disconnected)");
-    }
-		refresh();
+		//bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
+		//buffer[bytes] = 0;
+		//printf("Received %s\n", buffer);
+		Server_receiveData(network, &buffer);
+		//Server_broadcastData(network, buffer);
+		//sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
+		sprintf(data, "%d", i++);
+		//printf("data=%*.s\n", (int)strlen(data), data);
+		//printf("data=%s %lu %d\n", data, strlen(data), (int) strlen(data));
+		out = createPacket(data, strlen(data));
+			
+		//printf("Sending %s\n", (char*)out->data);
+		//out->data_size = strlen((char*) out->data);
+		Server_broadcastData(network, out);
+		//QueueReliableNetworkMessage(network, out);
+		//loopNetworkQueue(network);
+		//out = createPacket(data, strlen(data));
+		usleep(1000000);
 	}
+
+}
+
+void testMulti(char* ip){
+	hdNetwork* networkqueue = initializeNetworkQueue();
 }
 
 typedef struct {
@@ -326,6 +306,7 @@ void onHeartBeat(void* context, void* args) {
   hdScreen* screen = con->screen;
   Player* player = con->player;
   hdSprite* playerSprite = con->playerSprite;
+
   int* var = con->var;
 
   double dt = EngineClock_waitForNextFrame();
@@ -345,11 +326,13 @@ void onHeartBeat(void* context, void* args) {
   centerSpriteOnPlayer(playerSprite, player);
 
   mvprintw(10, 0, "Pos: (%.2lf, %.2lf)", player->pos.x, player->pos.y);
-  if (*var) {
-    mvprintw(11, 0, "Player x position has passed 10!! (Event now disconnected)");
+  if (*var == 1) {
+    mvprintw(11, 0, "Player x position has passed 700!! (Event now disconnected)");
+  } else {
+    mvprintw(11, 0, "Player x position not yet passed 700. (Event still connected)");
   }
   if (elapsed > 5) {
-    mvprintw(12, 0, "Over 5 seconds have passed!");
+    mvprintw(13, 0, "Over 5 seconds have passed!");
   }
   refresh();
 }
@@ -359,14 +342,16 @@ Signal* Game_init() {
 	Player* newPlayer = (Player*) calloc(1, sizeof(Player)); 
 	Player_init(newPlayer, "Jesse");
 
-  MovedCtx* context = calloc(1, sizeof(MovedCtx));
-  context->self = Signal_Connect(newPlayer->moved, &testEvent, context);
+  int* var = (int*) calloc(1, sizeof(int));
+
+  MovedCtx* MovedContext = calloc(1, sizeof(MovedCtx));
+  MovedContext->var = var;
+  MovedContext->self = Signal_Connect(newPlayer->moved, &IsPlayerPastXValOf700, MovedContext);
 
 	hdScreen* screen = initScreen();
 	hdSprite* bg = initSprite(loadRawImage("assets/TheSkeld.txt"), NULL);
 	hdSprite* cmap = initSprite(loadRawImage("assets/TheSkeldMask.txt"), NULL);
 	hdSprite* amog = initSprite(loadRawImage("assets/smallsus.txt"), NULL);
-  int var;
 
   addCollisionMap(screen, cmap);
   Player_enableCollision(newPlayer, screen);
@@ -380,7 +365,7 @@ Signal* Game_init() {
   HeartbeatContext->screen = screen;
   HeartbeatContext->player = newPlayer;
   HeartbeatContext->playerSprite = amog;
-  HeartbeatContext->var = &var;
+  HeartbeatContext->var = var;
 
   Signal_Connect(Heartbeat, &onHeartBeat, HeartbeatContext);
   return Heartbeat;
@@ -395,6 +380,21 @@ void StartLocalGame() {
   }
 }
 
-int main(){
+int main(int argc, char* argv[]){
+	//testRawImageReadingAndWriting("assets/sus.txt");
+	//testRawImageCompression("assets/TheSkeld.txt");
+	//testHashing();
+	//testScreen("assets/smallsus.txt", "assets/TheSkeld.txt");
+
+  //testEngineClock();
+	//testScreen("assets/TheSkeld.txt", "assets/sus.txt");
+
+	// if(argc == 1){
+	// 	testClient("127.0.0.1");
+	// }else{
+	// 	testServer("127.0.0.1");
+	// }
+	//testMulti("127.0.0.1");
+
   StartLocalGame();
 }

@@ -87,3 +87,15 @@ made functions that make the pixels work with the hashmap library I imported
 - Screen finished for real for real this time 
 
 - Started working on collisions 
+
+### 2026-01-14 
+
+- Stopped working on collisions and started working on networking
+
+- Began implementing a etwork queue 
+
+### 2026-01-15 
+
+- Finished networking (I hope)
+
+- ^this guy had no clue what he was talking about 

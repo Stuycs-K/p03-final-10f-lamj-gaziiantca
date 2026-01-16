@@ -7,7 +7,7 @@ int main(int argc, char *argv[] ) {
   }
 
   struct addrinfo *results;
-  int sockfd = setupUDP(IP, &results);
+  int sockfd = setupUDP_Client(IP, &results);
 
   char* message = "I always come back...";
   printf("Sending message to %s:%s...\n", IP, PORT);

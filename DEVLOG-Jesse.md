@@ -95,4 +95,4 @@
 
 - Reformatted main loop into a Heartbeat event in each frame. Improved readability. (40 min)
 
-
+- Merged into main and improved testing and naming scheme (20 min)
