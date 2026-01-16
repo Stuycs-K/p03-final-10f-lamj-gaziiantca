@@ -52,7 +52,7 @@ void returnToLastValidPos(void* context, void* args) {
 
   if (xPos < 0 || yPos < 0)
     return;
-  if (xPos >= cmapWidth * 2 || yPos >= cmapHeight)
+  if (xPos >= cmapWidth * 2 - 1 || yPos >= cmapHeight)
     return;
 
   int playerLocationIndex = yPos * cmapHeight + xPos;

@@ -1,6 +1,6 @@
 # Dev Log: Jesse Lam
 
-### 2026-01-06 - Backseating the Proposal.md
+### 2026-01-06 - Backseating the PROPOSAL.md
 - Added base file structure (10 min)
 
 - Criticized the proposal (5 min)
@@ -23,6 +23,8 @@
 
 - Added function to test frame timer and budget wasd inputs for changing player status (10 min)
 
+
+
 ### 2026-01-08 - Working on events
 
 - Backseating image rendering (10 min)
@@ -33,11 +35,15 @@
 
 - Edited some header definitions (Vector2, Player). Added event_signals.h header definitions. (20 min)
 
+
+
 ### 2026-01-09 - Adding events
 
 - Backseating bad image compression (1 min)
 
 - Worked on adding Signal/Event funciton definitions (40 min)
+
+
 
 ### 2026-01-11 (Weekend) - Completing events and fixing errors
 
@@ -55,11 +61,15 @@
   - Fixed issue with linked list not setting front/end correctly
   - Fixed issue with callbacks not being executed
 
+
+
 ### 2026-01-12 - Working on multiplayer. Helping debug screen.
 
 - Spent class time debugging and deeply criticizing screen.c's rotation feature (40 min)
 
 - Added test UDP client and server code (40 min)
+
+
 
 ### 2026-01-13 - Attempting to fix UDP for client. Worked on collision maps instead
 
@@ -69,6 +79,8 @@
 
 - Added Player_enableCollision to add a connection to Player.moved to return a player to the last valid position if moving into a collidable. (40 min)
 
+
+
 ### 2026-01-14 - Added photo-editing software to create a collision map. Trying to debug collision and screen code
 
 - Used GIMP on school computers to create collision map "mask" for map (20 min)
@@ -77,11 +89,13 @@
 
 - Trying to debug collision and camera (30 min)
 
+
+
 ### 2026-01-15 - Finally debugged collisions.
 
 - More failure at debugging collisions (20 min)
 
-- Spent 10 minutes trying to regenerate outdated map file. And locked myself out of my home directory. (Aleksandr's fault)
+- Spent 10 minutes trying to regenerate outdated map file. And locked myself out of my home directory. (Aleksandr's fault trust)
 
 - Spent another 10 minutes wondering why the map generation was mysteriously broken (tmux doesn't support colors)
 
@@ -96,3 +110,5 @@
 - Reformatted main loop into a Heartbeat event in each frame. Improved readability. (40 min)
 
 - Merged into main and improved testing and naming scheme (20 min)
+
+- Added readme documentation, info, and places to add descriptions (1 hr)

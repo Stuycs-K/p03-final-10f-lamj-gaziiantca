@@ -189,7 +189,7 @@ typedef struct {
   Connection* self;
 } MovedCtx;
 
-void IsPlayerPastXValOf700(void* context, void* args) { // Check if player x pos is >= 10
+void IsPlayerPastXValOf700(void* context, void* args) { // Check if player x pos is >= 700
   MovedCtx* con = (MovedCtx*) context;
   Vector2 pos = *((Vector2*) args);
 
