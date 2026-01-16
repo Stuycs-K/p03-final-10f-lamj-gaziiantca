@@ -22,6 +22,19 @@ We have a (perhapseth useful) explanation video:
   - [YouTube](https://youtu.be/oVhpzuQS6QM),
   - [Google Drive](https://drive.google.com/file/d/1RGw3FeTWNVIox9mwPq2uTTM96xRaM53r/view?usp=drive_link)
 
+### Libraries:
+  - ncurses
+    - Debian/Ubuntu:
+      ```
+      $ sudo apt update
+      $ sudo apt install libncurses5-dev libncursesw5-dev
+      ```
+    - Arch:
+      ```
+      $ sudo pacman -S ncurses
+      ```
+
+
 ### Instructions:
 
 To compile:
