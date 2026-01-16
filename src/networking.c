@@ -113,33 +113,52 @@ int loopNetworkQueue(hdNetwork* queue){
 }
 
 hdPacket* createPacket(void* data, u64 data_size){ //will notably not be reliable unless put into the network queue
-	hdPacket* out = (hdPacket*) (calloc(sizeof(hdPacket), 1));
+	hdPacket* out = (hdPacket*) (calloc(sizeof(hdPacket)+data_size, 1));
 	memcpy(out->data, data, data_size); 
+	//printf("creating packet with data %*.s\n", (int)data_size, (char*)data);
 	out->data_size = data_size;
 	out->pos = -1;
 	return out;
 }
 
-void Server_receiveData(hdNetwork* network, hdPacket* buffer){ //will write a packet to the buffer. EVERYTHING sent by the client MUST be in a packet. The packets are NOT optional. This is the reason
+void Server_receiveData(hdNetwork* network, hdPacket** ptrBuffer){ //will write a packet to the buffer. EVERYTHING sent by the client MUST be in a packet. The packets are NOT optional. This is the reason
 	int bytes; 
+	hdPacket* buffer = *ptrBuffer;
+	
 	socklen_t bruh = network->addr_len; //this reeks
-	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->servaddr, &bruh);
+	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), MSG_PEEK, (struct sockaddr*) &network->servaddr, &bruh);
 	if(bytes > 0){
 		Server_getClient(network, bruh);
-		//lowkey wasteful but I don't have the time to care anymore
+		u32 len = sizeof(hdPacket) + buffer->data_size;
+		free(buffer);
+		buffer = malloc(len);
+		*ptrBuffer = buffer;
+		bytes = recvfrom(network->sockfd, buffer, len, 0, (struct sockaddr*) &network->servaddr, &bruh); //genius code over here. haters cannot fathom.
 		//printf("sending ack with pos=%d dat=%s\n", buffer->pos, (char*)buffer->data);
-		sendto(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->servaddr, network->addr_len); 
+		
+		//lowkey wasteful but I don't have the time to care anymore
+		sendto(network->sockfd, buffer, sizeof(hdPacket) + buffer->data_size, 0, (struct sockaddr*) &network->servaddr, network->addr_len); 
 	}
 }
 
-void Client_receiveData(hdNetwork* network, hdPacket* buffer){
+void Client_receiveData(hdNetwork* network, hdPacket** ptrBuffer){
 	int bytes; 
+	hdPacket* buffer = *ptrBuffer; 
 	socklen_t IloveC = network->addr_len;
-	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->servaddr, &IloveC);
+	bytes = recvfrom(network->sockfd, buffer, sizeof(hdPacket), MSG_PEEK, (struct sockaddr*) &network->servaddr, &IloveC);
 	if(bytes > 0){
+		u32 len = sizeof(hdPacket) + buffer->data_size;
+		free(buffer); 
+		buffer = malloc(len); 
+		*ptrBuffer = buffer;
+		bytes = recvfrom(network->sockfd, buffer, len, 0, (struct sockaddr*) &network->servaddr, &IloveC);
 		//printf("%d\n", buffer->pos);
 		handleAck(network, buffer->pos);
 	}
+}
+
+void Client_sendData(hdNetwork* network, hdPacket* packet){
+	sendMessage(network->sockfd, packet, packet->data_size + sizeof(hdPacket), (struct sockaddr*) &network->servaddr, network->addr_len);
 }
 
 void Server_getClient(hdNetwork* network, socklen_t socklen) { //if this works first try im officially god
@@ -168,14 +187,15 @@ void Server_getClient(hdNetwork* network, socklen_t socklen) { //if this works f
 	}
 }
 
-void Server_broadcastData(hdNetwork* network, hdPacket* buffer){
+void Server_broadcastData(hdNetwork* network, hdPacket* packet){
 	for(int i=0; i<MAX_CLIENTS; i++){
 		//printf("%d\n", network->clients[i].isreal);
 		if(network->clients[i].isreal){
-			//printf("Sent stuff\n");
-			sendto(network->sockfd, buffer, sizeof(hdPacket), 0, (struct sockaddr*) &network->clients[i].sockaddr, network->clients[i].addr_len);
+			printf("Sent stuff %*.s\n", packet->data_size, packet->data);
+			sendto(network->sockfd, packet, sizeof(hdPacket)+packet->data_size, 0, (struct sockaddr*) &network->clients[i].sockaddr, network->clients[i].addr_len);
 		}
 	}
+	free(packet);
 }
 
 static void err(int i, char*message){

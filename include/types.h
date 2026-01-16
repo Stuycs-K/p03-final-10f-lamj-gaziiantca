@@ -81,13 +81,12 @@ typedef struct hdScreen {
 	hdCamera* camera;
 } hdScreen;
 
-#define MAX_PACKET_SIZE 1024
 typedef struct NetworkPacket {
 	i16 pos; //it can be -1 if getting an ack doesn't matter
 	u64 time_sent; 
 	u32 data_size; 
 	bool isreal; 
-	u8 data[MAX_PACKET_SIZE];
+	u8 data[];
 } hdPacket;
 
 typedef struct {

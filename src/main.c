@@ -294,19 +294,19 @@ void testClient(char* ip){
 	char* message = (char*) (malloc(100)); 
 	strcpy(message, "sus");
 	hdPacket* out = createPacket(message, strlen(message));
-	QueueReliableNetworkMessage(queue, out);
+	//QueueReliableNetworkMessage(queue, out);
 	printf("Letting the server know we exist\n");
-	loopNetworkQueue(queue);
+	//loopNetworkQueue(queue);
+	Client_sendData(queue, out);
 	int bytes;
+	hdPacket* in = (hdPacket*) (calloc(sizeof(hdPacket), 1));
 	int i=0;
 	while(1){
-		hdPacket* in = (hdPacket*) (calloc(sizeof(hdPacket), 1));
 		//sprintf(message, "%d", i++);
 		//bytes = loopNetworkQueue(queue);
 		printf("Waiting...\n");
-		Client_receiveData(queue, in);
+		Client_receiveData(queue, &in);
 		printf("Received back from the server: %s, pos id: %d\n", (char*)in->data, in->pos);
-		free(in);
 		//out = createPacket(message, strlen(message));
 		
 		//QueueReliableNetworkMessage(queue, out); //this will free() the original out. it queues a copy of out. 
@@ -330,18 +330,21 @@ void testServer(char* ip){
 		//bytes = recvfrom(server_fd, buffer, sizeof(buffer)-1, 0, (struct sockaddr*) &client_addr, &addr_len);
 		//buffer[bytes] = 0;
 		//printf("Received %s\n", buffer);
-		Server_receiveData(network, buffer);
+		Server_receiveData(network, &buffer);
 		//Server_broadcastData(network, buffer);
 		//sendto(server_fd, buffer, strlen(buffer), 0, (struct sockaddr*) &client_addr, addr_len);
-		sprintf((char*) out->data, "%d", i++);
+		sprintf(data, "%d", i++);
+		//printf("data=%*.s\n", (int)strlen(data), data);
+		//printf("data=%s %lu %d\n", data, strlen(data), (int) strlen(data));
+		out = createPacket(data, strlen(data));
 			
 		//printf("Sending %s\n", (char*)out->data);
-		out->data_size = strlen((char*) out->data);
+		//out->data_size = strlen((char*) out->data);
 		Server_broadcastData(network, out);
 		//QueueReliableNetworkMessage(network, out);
 		//loopNetworkQueue(network);
 		//out = createPacket(data, strlen(data));
-		usleep(10000);
+		usleep(1000000);
 	}
 
 }
