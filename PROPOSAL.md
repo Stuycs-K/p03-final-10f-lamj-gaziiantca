@@ -1,4 +1,3 @@
-
 # Final Project Proposal
 
 ## Group Members:
@@ -35,3 +34,5 @@
 - WASD Movement toggle input, kind of like a joystick (GLFW but worse)
 
 - UDP networking library (our own)
+
+- Plan: finish the base lib after 1.5 weeks, and then we try to make a demo
