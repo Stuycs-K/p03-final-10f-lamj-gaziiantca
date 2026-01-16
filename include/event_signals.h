@@ -27,6 +27,7 @@
   void Signal_Fire(Signal* self, void* arg);
   Connection* Signal_Connect(Signal* self, SignalCallback callback, void* context);
   Connection* Signal_ConnectOnce(Signal* self, SignalCallback callback, void* context);
+  void Signal_Free(Signal* self);
 
   void Connection_Disconnect(Connection* self);
 

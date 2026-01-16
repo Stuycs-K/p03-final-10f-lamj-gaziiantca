@@ -43,6 +43,11 @@ Connection* Signal_ConnectOnce(Signal* self, SignalCallback callback, void* cont
   return newConn;
 }
 
+void Signal_Free(Signal* self) {
+  LinkedList_free(self->connections);
+  free(self);
+}
+
 void Connection_Disconnect(Connection* self) {
   LinkedList_deleteNode(self->parent->connections, self->connectionNode);
   free(self);
